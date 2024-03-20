@@ -29,3 +29,4 @@ XML로도 `@Configuration` 설정 가능
 다양한 설정 형식을 지원할 수 있는 이유? → BeanDefinition으로 추상화
 
 메타데이터란?
+.
