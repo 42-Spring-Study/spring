@@ -18,7 +18,7 @@ java spring boot에서는 자동으로 제공을 해준다.
 
 ## MVC
 
-[[**java**] MVC](https://www.notion.so/java-MVC-d7b0d462e5864f5aad9686edd9d1d427?pvs=21) 
+[[**java**] MVC](https://moaoh.dev/151) 
 
 ## 템플릿 엔진
 
