@@ -125,7 +125,7 @@ ApplicationContext context = new AnnotationConfigApplicationContext(AutoAppConfi
 
 
 
-![스크린샷 2024-03-27 오전 11.02.29](../img/seongtki_210.png)
+![스크린샷 2024-03-27 오전 11.02.29](../img/seongtki_215.png)
 
 - `getBean` 을 하위 타입으로 지정할 수 도 있지만, 하위 타입으로 지정하는 것은 DIP를 위배하고 유연성이 떨어진다. 
   스프링 빈을 수동 등록해서 문제를 해결해도 되지만, `의존 관계 자동 주입에서 해결하는 여러 방법`이 있다.
