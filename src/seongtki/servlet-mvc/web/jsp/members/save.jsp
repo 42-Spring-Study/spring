@@ -5,7 +5,6 @@
     //request, response 사용 가능
     MemberRepository memberRepository = MemberRepository.getInstance();
 
-    System.out.println("MemberSaveServlet.service");
     String username = request.getParameter("username");
     int age = Integer.parseInt(request.getParameter("age"));
 
