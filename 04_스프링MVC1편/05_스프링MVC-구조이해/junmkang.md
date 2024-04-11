@@ -4,11 +4,11 @@
 
 **직접 만든 MVC 프레임워크 구조**
 
-![Untitled](%E1%84%89%E1%85%A6%E1%86%A8%E1%84%89%E1%85%A7%E1%86%AB%205%20%E1%84%89%E1%85%B3%E1%84%91%E1%85%B3%E1%84%85%E1%85%B5%E1%86%BC%20MVC%20-%20%E1%84%80%E1%85%AE%E1%84%8C%E1%85%A9%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%2072686520fb234d5fb0a9c124fd96dd2f/Untitled.png)
+![Untitled](../img/junmkang_0501.png)
 
 **spring MVC 구조**
 
-![Screen Shot 2024-04-08 at 4.53.34 PM.png](%E1%84%89%E1%85%A6%E1%86%A8%E1%84%89%E1%85%A7%E1%86%AB%205%20%E1%84%89%E1%85%B3%E1%84%91%E1%85%B3%E1%84%85%E1%85%B5%E1%86%BC%20MVC%20-%20%E1%84%80%E1%85%AE%E1%84%8C%E1%85%A9%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%2072686520fb234d5fb0a9c124fd96dd2f/Screen_Shot_2024-04-08_at_4.53.34_PM.png)
+![Screen Shot 2024-04-08 at 4.53.34 PM.png](../img/junmkang_0502.png)
 
 이전에 v1 ~ v5까지 직접 만들었던 MVC 프레임 워크의 구조와 실제 spring MVC의 구조가 똑같은 것을 확인할 수 있다.
 
@@ -214,7 +214,7 @@ public class SpringMemberFormControllerV1 {
 
 ## 스프링 MVC - 컨트롤러 통합
 
-![Untitled](%E1%84%89%E1%85%A6%E1%86%A8%E1%84%89%E1%85%A7%E1%86%AB%205%20%E1%84%89%E1%85%B3%E1%84%91%E1%85%B3%E1%84%85%E1%85%B5%E1%86%BC%20MVC%20-%20%E1%84%80%E1%85%AE%E1%84%8C%E1%85%A9%20%E1%84%8B%E1%85%B5%E1%84%92%E1%85%A2%2072686520fb234d5fb0a9c124fd96dd2f/Untitled%201.png)
+![Untitled](../img/junmkang_0503.png)
 
 기존에 `@Controller` 를 작성할때에는 하나의 파일에 하나의 `@RequestMapping` 함수만 사용해서 작성을 했었는데. 당연하게도 하나의 `@Controller` 안에 여러개의 `@RequestMapping`를 작성하는 것도 가능하다.
 
