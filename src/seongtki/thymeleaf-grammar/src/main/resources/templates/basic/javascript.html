@@ -34,5 +34,21 @@
     var user = [[${user}]];
     console.log(user);
 </script>
+
+
+
+<!-- 자바스크립트 인라인 each -->
+<!-- 결과
+    var user1 = {"username":"userA","age":10};
+    var user2 = {"username":"userB","age":20};
+    var user3 = {"username":"userC","age":30};-->
+<script th:inline="javascript">
+    [# th:each="user, stat : ${users}"]
+    var user[[${stat.count}]] = [[${user}]];
+    [/]
+</script>
+
+
+
 </body>
 </html>
