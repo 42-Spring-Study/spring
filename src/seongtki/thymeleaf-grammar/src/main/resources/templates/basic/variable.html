@@ -25,5 +25,14 @@
     <li>${userMap['userA'].getUsername()} = <span th:text="${userMap['userA'].getUsername()}"></span></li>
     <li>${userMap['userA']['username']} = <span th:text="${userMap['userA']['username']}"></span></li>
 </ul>
+
+<h1>지역 변수 - (th:with)</h1>
+<div th:with="first=${users[0]}">
+    <p>List: <span th:text="${first.username}"></span></p>
+</div>
+<div th:with="first=${userMap['userA']}">
+    <p>Map: <span th:text="${first.username}"></span></p>
+</div>
+
 </body>
 </html>
