@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    // js에서 문자열은 EL 표현식에 쌍따옴표로 감싸야 한다.
+    var username = "[[${user.username}]]";
+    console.log(username);
+    var age = [[${user.age}]];
+    console.log(age);
+    //자바스크립트 내추럴 템플릿 - /*userA*/ 형태로 해석되어 주석처리된다.
+    var username2 = /*[[${user.username}]]*/ "test username";
+    console.log(username2);
+    //객체 - 해당객체읭 toString() 형태가 출력됨.
+    var user = "[[${user}]]";
+    console.log(user);
+</script>
+
+<!-- 자바스크립트 인라인 -->
+<script th:inline="javascript">
+    var username = [[${user.username}]];
+    console.log(username);
+    var age = [[${user.age}]];
+    console.log(age);
+
+    //자바스크립트 내추럴 템플릿 - "userA" 로 해석되어 내추럴 템플릿 동작함.
+    var username2 = /*[[${user.username}]]*/ "test username";
+    console.log(username2);
+    //객체
+    // 타임리프의 자바스크립트 인라인 기능을 사용하면 객체를 JSON으로 자동으로 변환해준다.
+    var user = [[${user}]];
+    console.log(user);
+</script>
+</body>
+</html>
