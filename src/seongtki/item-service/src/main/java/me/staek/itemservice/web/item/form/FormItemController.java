@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.staek.itemservice.domain.item.Item;
 import me.staek.itemservice.domain.item.ItemRepository;
+import me.staek.itemservice.domain.item.ItemType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,9 @@ public class FormItemController {
         repository.save(new Item("testB", 20000, 20));
     }
 
+    /**
+     * 컨트롤러 클래스가 호출될 때마다 자동호출된다 (리팩토링 필요)
+     */
     @ModelAttribute("regions")
     public Map<String, String> regions() {
         Map<String, String> regions = new LinkedHashMap<>();
@@ -38,6 +42,14 @@ public class FormItemController {
         regions.put("BUSAN", "부산");
         regions.put("JEJU", "제주");
         return regions;
+    }
+
+    /**
+     * 컨트롤러 클래스가 호출될 때마다 자동호출된다 (리팩토링 필요)
+     */
+    @ModelAttribute("itemTypes")
+    public ItemType[] itemTypes() {
+        return ItemType.values();
     }
 
     @GetMapping
@@ -83,6 +95,8 @@ public class FormItemController {
     public String save5(Item item, RedirectAttributes redirectAttributes) {
         log.info("item.open={}", item.isOpen());
         log.info("item.regions={}", item.getRegions());
+        log.info("item.itemType={}", item.getItemType());
+
         Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
