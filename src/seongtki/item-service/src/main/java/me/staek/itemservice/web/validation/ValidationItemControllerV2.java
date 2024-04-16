@@ -150,7 +150,7 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItem3(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
         /**
@@ -178,6 +178,50 @@ public class ValidationItemControllerV2 {
             int retPrice = item.getPrice() * item.getQuantity();
             if (retPrice < 10000)
                 br.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, retPrice}, "가격*수량 은 10,000 이상이어야 한다. 현재 값:" + retPrice));
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v2/addForm";
+        }
+
+        Item saved = repository.save(item);
+        redirectAttributes.addAttribute("itemId", saved.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+
+    @PostMapping("/add")
+    public String addItem4(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+
+        /**
+         * rejectValue(), reject() 메서드
+         *  field : 오류 필드명
+         *  errorCode : 오류 코드(messageResolver 를 위한 코드)
+         *  errorArgs : 오류 메시지에서 {0} 을 치환하기 위한 값
+         *  defaultMessage : 오류 메시지를 찾을 수 없을 때 사용하는 기본 메시지
+         */
+
+        log.info("objectName={}", br.getObjectName()); //objectName=item
+        // target=Item(id=null, itemName=awef, price=2000, quantity=22222, open=false, regions=[], itemType=null, deliveryCode=)
+        log.info("target={}", br.getTarget());
+
+        // 개별 필드 검증
+        if (!StringUtils.hasText(item.getItemName()))
+            br.rejectValue("itemName", "required");
+
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 100_000)
+            br.rejectValue("price", "range", new Object[]{1000,100000}, null);
+        if (item.getQuantity() == null || item.getQuantity() > 9999)
+            br.rejectValue("quantity", "max", new Object[]{9999}, null);
+
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
         }
 
         // 검증 실패 시 입력폼으로 이동
