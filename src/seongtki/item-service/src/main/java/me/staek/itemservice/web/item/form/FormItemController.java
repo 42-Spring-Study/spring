@@ -10,7 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -27,6 +29,15 @@ public class FormItemController {
     public void init() {
         repository.save(new Item("testA", 10000, 10));
         repository.save(new Item("testB", 20000, 20));
+    }
+
+    @ModelAttribute("regions")
+    public Map<String, String> regions() {
+        Map<String, String> regions = new LinkedHashMap<>();
+        regions.put("SEOUL", "서울");
+        regions.put("BUSAN", "부산");
+        regions.put("JEJU", "제주");
+        return regions;
     }
 
     @GetMapping
@@ -54,17 +65,24 @@ public class FormItemController {
     }
 
     /**
+     * ** 단일 체크박스 **
      * 체크박스의 open는 언체크 시 requestBody 에 없다. (브라우저에서 안보냄)
      * 언체크 시 아래 로그에서는 확인가능함.(false)
      * 체크하면 requestBody에 있다.
      *
      * 스프링부트 3.0이전버전은 _open 태그가 있어야 언체크 시 null 이 출력되는데
-     * 최신버전은 false로 잘 출력되마
+     * 최신버전은 false로 잘 출력됨
+     *
+     *
+     * ** 다중 체크박스 로그 예시**
+     * 모두 언체크 하면 => item.regions=[]
+     * 체크하면 =>  item.regions=[SEOUL, BUSAN]
      *
      */
     @PostMapping("/add")
     public String save5(Item item, RedirectAttributes redirectAttributes) {
         log.info("item.open={}", item.isOpen());
+        log.info("item.regions={}", item.getRegions());
         Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
