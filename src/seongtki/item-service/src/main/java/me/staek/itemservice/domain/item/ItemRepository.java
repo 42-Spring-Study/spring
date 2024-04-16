@@ -33,6 +33,9 @@ public class ItemRepository {
         item.setItemName(uptItem.getItemName());
         item.setPrice(uptItem.getPrice());
         item.setQuantity(uptItem.getQuantity());
+        item.setOpen(uptItem.isOpen());
+        item.setItemType(uptItem.getItemType());
+        item.setRegions(uptItem.getRegions());
     }
 
     public void clearStore() {
