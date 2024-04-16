@@ -29,7 +29,6 @@ import java.util.Map;
 public class ValidationItemControllerV3 {
 
     private final ItemRepository repository;
-    private final ItemValidator validator;
 
     /**
      * 컨트롤러 클래스가 호출될 때마다 자동호출된다 (리팩토링 필요)
@@ -83,14 +82,25 @@ public class ValidationItemControllerV3 {
         return "validation/v3/addForm";
     }
 
-    @InitBinder
-    public void init(WebDataBinder dataBinder) {
-        log.info("init binder {}", dataBinder);
-        dataBinder.addValidators(validator);
-    }
-
+    /**
+     * @InitBinder 를 태그한 ItemValidator 를 추가하는 메서드를 삭제한다.
+     * 일전에 추가한 spring-boot-starter-validation 라이브러리가 자동으로 Bean Validator를 인지하고 스프링에 통합된다.
+     * LocalValidatorFactoryBean을 글로벌 validator에 등록하여 사용자는 @Validated를 사용하기만 하면
+     * 타겟 오브젝트의 @NotNull 등을 검사한다.
+     *
+     *
+     * **검증순서
+     * @ModelAttribute 각각의 필드에 타입 변환 시도
+     * 1. 바인딩에 성공하면 다음로직으로이동 (실패하면 typeMismatch 로 FieldError 추가)
+     * 3. BeanValidation 적용
+     *
+     *
+     * 예시)
+     * 1. itemName 에 문자 "A" 입력 타입 변환 성공 itemName 필드에 BeanValidation 적용
+     * 2. price 에 문자 "A" 입력 "A"를 숫자 타입 변환 시도 실패 typeMismatch FieldError 추가 price 필드는 BeanValidation 적용 X
+     */
     @PostMapping("/add")
-    public String addItem6(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+    public String addItem1(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
         // 검증 실패 시 입력폼으로 이동
         if (br.hasErrors()) {
