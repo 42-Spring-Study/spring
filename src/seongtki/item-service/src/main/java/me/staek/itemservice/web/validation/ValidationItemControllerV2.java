@@ -12,6 +12,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -243,7 +245,7 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItem5(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
         /**
@@ -262,6 +264,33 @@ public class ValidationItemControllerV2 {
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v2/items/{itemId}";
     }
+
+    @InitBinder
+    public void init(WebDataBinder dataBinder) {
+        log.info("init binder {}", dataBinder);
+        dataBinder.addValidators(validator);
+    }
+
+    @PostMapping("/add")
+    public String addItem6(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+
+        /**
+         * @Validated 태그를 target object에 추가하면 WebDataBinder에 추가되어 있는 validator가 동작한다.
+         * ItemValidator는 support()에 의해 타겟을 검사하므로 안전하다.
+         */
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v2/addForm";
+        }
+
+        Item saved = repository.save(item);
+        redirectAttributes.addAttribute("itemId", saved.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
