@@ -24,6 +24,7 @@ import java.util.*;
 public class ValidationItemControllerV2 {
 
     private final ItemRepository repository;
+    private final ItemValidator validator;
 
     /**
      * 컨트롤러 클래스가 호출될 때마다 자동호출된다 (리팩토링 필요)
@@ -193,7 +194,7 @@ public class ValidationItemControllerV2 {
     }
 
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItem4(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
         /**
@@ -202,6 +203,12 @@ public class ValidationItemControllerV2 {
          *  errorCode : 오류 코드(messageResolver 를 위한 코드)
          *  errorArgs : 오류 메시지에서 {0} 을 치환하기 위한 값
          *  defaultMessage : 오류 메시지를 찾을 수 없을 때 사용하는 기본 메시지
+         *
+         * 검증순서 정리
+         * 1. rejectValue() 호출
+         * 2. MessageCodesResolver 를 사용해서 검증 오류 코드로 메시지 코드들을 생성
+         * 3. new FieldError() 를 생성하면서 메시지 코드들을 보관
+         * 4. th:erros 에서 메시지 코드들로 메시지를 순서대로 메시지에서 찾고, 표출
          */
 
         log.info("objectName={}", br.getObjectName()); //objectName=item
@@ -236,6 +243,25 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
+    @PostMapping("/add")
+    public String addItem5(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+
+        /**
+         * Valicator를 확장한 빈의 메서드에 검증로직을 담고 호출한다.
+         */
+        validator.validate(item, br);
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v2/addForm";
+        }
+
+        Item saved = repository.save(item);
+        redirectAttributes.addAttribute("itemId", saved.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
