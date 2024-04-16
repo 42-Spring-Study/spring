@@ -41,8 +41,13 @@ public class FormItemController {
         return "form/item";
     }
 
+    /**
+     * th:object 를 적용하기 위해 먼저 해당 오브젝트 정보를 넘겨준다.
+     * 등록 폼이기 때문에 데이터가 비어있는 빈 오브젝트를 만들어서 뷰에 전달한다.
+     */
     @GetMapping("/add")
     public String item(Model model) {
+        model.addAttribute("item", new Item());
         return "form/addForm";
     }
 
