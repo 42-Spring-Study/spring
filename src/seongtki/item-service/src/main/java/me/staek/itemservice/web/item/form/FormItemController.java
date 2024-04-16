@@ -2,6 +2,7 @@ package me.staek.itemservice.web.item.form;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.staek.itemservice.domain.item.Item;
 import me.staek.itemservice.domain.item.ItemRepository;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/form/items")
 @RequiredArgsConstructor
@@ -51,55 +53,18 @@ public class FormItemController {
         return "form/addForm";
     }
 
-//    @PostMapping("/add")
-    public String save(@RequestParam String itemName
-            , @RequestParam Integer price
-            , @RequestParam Integer quantity
-            , Model model) {
-        model.addAttribute("item", repository.save(new Item(itemName, price, quantity)));
-        return "form/item";
-    }
-
     /**
-     * 인자로 ModelAttribute를 받으면, Model에 Item객체를 추가하지 않아도 유지된다.
-     */
-//    @PostMapping("/add")
-    public String save2(@ModelAttribute("item") Item item) {
-        repository.save(item);
-        return "form/item";
-    }
-
-    /**
-     * @ModelAttribute를 생략해도 사용자 객체라면 자동 적용된다.
-     * (alias는 정할 수 없다 - 인자가그대로 키로 적용됨 (맨 앞글자만 소문자로 변경)
-     */
-//    @PostMapping("/add")
-    public String save3(Item item, Model model) {
-        repository.save(item);
-        return "form/item";
-    }
-
-    /**
-     * 저장 후 새로고침 시 이전요청이 발생하는데 이 경우는 다시 post요청되므로,
-     * 저장이후 get요청을 하게 하여 보다 안전하게 구성한다.
+     * 체크박스의 open는 언체크 시 requestBody 에 없다. (브라우저에서 안보냄)
+     * 언체크 시 아래 로그에서는 확인가능함.(false)
+     * 체크하면 requestBody에 있다.
      *
-     * 하지만 urlencode가 안된다는 단점이 존재함
-     */
-//    @PostMapping("/add")
-    public String save4(Item item, Model model) {
-        Item saved = repository.save(item);
-        return "redirect:/form/items/" + saved.getId();
-    }
-
-    /**
-     * RedirectAttributes
-     * - URL 인코딩도 해주고, pathVariable , 쿼리 파라미터까지 처리해준다
+     * 스프링부트 3.0이전버전은 _open 태그가 있어야 언체크 시 null 이 출력되는데
+     * 최신버전은 false로 잘 출력되마
      *
-     * ${param.status} - 타임리프에서 쿼리 파라미터를 편리하게 조회하는 기능
-     * 원래는 컨트롤러에서 모델에 직접 담고 값을 꺼내야 하지만 쿼리파라미터는 자동지원됨.
      */
     @PostMapping("/add")
     public String save5(Item item, RedirectAttributes redirectAttributes) {
+        log.info("item.open={}", item.isOpen());
         Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
