@@ -18,13 +18,13 @@ public class ItemServiceApplication {
      * springboot에서는 application.properties에 spring.messages.basename=messages 와 같이 기입하면 작동한다.
      * @return
      */
-    @Bean
-    public MessageSource messageSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames("messages", "errors");
-        messageSource.setDefaultEncoding("utf-8");
-        return messageSource;
-    }
+//    @Bean
+//    public MessageSource messageSource() {
+//        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+//        messageSource.setBasenames("messages", "errors");
+//        messageSource.setDefaultEncoding("utf-8");
+//        return messageSource;
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(ItemServiceApplication.class, args);
