@@ -111,7 +111,7 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItem2(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
         /**
@@ -136,6 +136,48 @@ public class ValidationItemControllerV2 {
             int retPrice = item.getPrice() * item.getQuantity();
             if (retPrice < 10000)
                 br.addError(new ObjectError("item", null, null, "가격*수량 은 10,000 이상이어야 한다. 현재 값:" + retPrice));
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v2/addForm";
+        }
+
+        Item saved = repository.save(item);
+        redirectAttributes.addAttribute("itemId", saved.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItem3(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+
+        /**
+         * 아래는 FieldError의 생성자 인자이다.
+         *  objectName : 오류가 발생한 객체 이름
+         *  field : 오류 필드
+         *  rejectedValue : 사용자가 입력한 값(거절된 값)
+         *  bindingFailure : 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
+         *  codes : 메시지 코드
+         *  arguments : 메시지에서 사용하는 인자
+         *  defaultMessage : 기본 오류 메시지
+         *  -> codes와 arguments를 추가해서 메세지를 errors.properties가 관리하도록 한다.
+         */
+        // 개별 필드 검증
+        if (!StringUtils.hasText(item.getItemName()))
+            br.addError(new FieldError("item", "itemName", item.getItemName(), false, new String[]{"required.item.itemName"}, null, "상품이름은 필수입니다."));
+
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 100_000)
+            br.addError(new FieldError("item","price", item.getPrice(), false, new String[]{"range.item.price"}, new Object[]{1000,100000}, "가격은 1000~100,000 범위가 합니다."));
+        if (item.getQuantity() == null || item.getQuantity() > 9999)
+            br.addError(new FieldError("item", "quantity", item.getQuantity(), false, new String[]{"max.item.quantity"}, new Object[]{9999}, "수량은 9,999까지 가능합니다."));
+
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                br.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, retPrice}, "가격*수량 은 10,000 이상이어야 한다. 현재 값:" + retPrice));
         }
 
         // 검증 실패 시 입력폼으로 이동
