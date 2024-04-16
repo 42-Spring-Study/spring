@@ -265,11 +265,11 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @InitBinder
-    public void init(WebDataBinder dataBinder) {
-        log.info("init binder {}", dataBinder);
-        dataBinder.addValidators(validator);
-    }
+//    @InitBinder
+//    public void init(WebDataBinder dataBinder) {
+//        log.info("init binder {}", dataBinder);
+//        dataBinder.addValidators(validator);
+//    }
 
     @PostMapping("/add")
     public String addItem6(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
