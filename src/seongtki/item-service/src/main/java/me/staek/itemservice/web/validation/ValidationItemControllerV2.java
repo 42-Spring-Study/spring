@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -66,17 +68,17 @@ public class ValidationItemControllerV2 {
     public String item(@PathVariable Long itemId, Model model) {
         Item finded = repository.findByItem(itemId);
         model.addAttribute("item", finded);
-        return "validation/v1/item";
+        return "validation/v2/item";
     }
 
     @GetMapping("/add")
     public String item(Model model) {
         model.addAttribute("item", new Item());
-        return "validation/v1/addForm";
+        return "validation/v2/addForm";
     }
 
     @PostMapping("/add")
-    public String save5(Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String save5(Item item, BindingResult br, RedirectAttributes redirectAttributes, Model model) {
 
         /**
          *
@@ -85,23 +87,24 @@ public class ValidationItemControllerV2 {
 
         // 개별 필드 검증
         if (!StringUtils.hasText(item.getItemName()))
-            errors.put("itemName", "상품이름은 필수입니다.");
+            br.addError(new FieldError("item", "itemName", "상품이름은 필수입니다."));
+
         if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 100_000)
-            errors.put("price", "가격은 1000~100,000 범위가 합니다.");
+            br.addError(new FieldError("item","price","가격은 1000~100,000 범위가 합니다."));
         if (item.getQuantity() == null || item.getQuantity() > 9999)
-            errors.put("quantity", "수량은 9,999까지 가능합니다.");
+            br.addError(new FieldError("item", "quantity", "수량은 9,999까지 가능합니다."));
 
         // 복합 필드 검증
         if (item.getPrice() != null && item.getQuantity() != null) {
             int retPrice = item.getPrice() * item.getQuantity();
             if (retPrice < 10000)
-                errors.put("globalError", "가격*수량 은 10,000 이상이어야 한다. 현재 값:" + retPrice);
+                br.addError(new ObjectError("item", "가격*수량 은 10,000 이상이어야 한다. 현재 값:" + retPrice));
         }
 
         // 검증 실패 시 입력폼으로 이동
-        if (!errors.isEmpty()) {
-            model.addAttribute("errors", errors);
-            return "validation/v1/addForm";
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v2/addForm";
         }
 
         Item saved = repository.save(item);
@@ -114,7 +117,7 @@ public class ValidationItemControllerV2 {
     public String edit(@PathVariable Long itemId, Model model) {
         Item finded = repository.findByItem(itemId);
         model.addAttribute("item", finded);
-        return "validation/v1/editForm";
+        return "validation/v2/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
