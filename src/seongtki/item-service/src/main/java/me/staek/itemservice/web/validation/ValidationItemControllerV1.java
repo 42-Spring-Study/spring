@@ -8,13 +8,11 @@ import me.staek.itemservice.domain.item.ItemRepository;
 import me.staek.itemservice.domain.item.ItemType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -70,36 +68,49 @@ public class ValidationItemControllerV1 {
         return "validation/v1/item";
     }
 
-    /**
-     * th:object 를 적용하기 위해 먼저 해당 오브젝트 정보를 넘겨준다.
-     * 등록 폼이기 때문에 데이터가 비어있는 빈 오브젝트를 만들어서 뷰에 전달한다.
-     */
     @GetMapping("/add")
     public String item(Model model) {
         model.addAttribute("item", new Item());
         return "validation/v1/addForm";
     }
 
-    /**
-     * ** 단일 체크박스 **
-     * 체크박스의 open는 언체크 시 requestBody 에 없다. (브라우저에서 안보냄)
-     * 언체크 시 아래 로그에서는 확인가능함.(false)
-     * 체크하면 requestBody에 있다.
-     *
-     * 스프링부트 3.0이전버전은 _open 태그가 있어야 언체크 시 null 이 출력되는데
-     * 최신버전은 false로 잘 출력됨
-     *
-     *
-     * ** 다중 체크박스 로그 예시**
-     * 모두 언체크 하면 => item.regions=[]
-     * 체크하면 =>  item.regions=[SEOUL, BUSAN]
-     *
-     */
     @PostMapping("/add")
-    public String save5(Item item, RedirectAttributes redirectAttributes) {
-        log.info("item.open={}", item.isOpen());
-        log.info("item.regions={}", item.getRegions());
-        log.info("item.itemType={}", item.getItemType());
+    public String save5(Item item, RedirectAttributes redirectAttributes, Model model) {
+
+        /**
+         * 검증로직 작성에 대한 문제점
+         *
+         * 1. 뷰 템플릿에서 중복 처리가 많다. (addForm.html)
+         *
+         * 2. 타입 오류 처리가 안된다. Item 의 price , quantity 같은 숫자 필드는 타입이 Integer 이므로 문자 타입
+         * 으로 설정하는 것이 불가능하다. 숫자 타입에 문자가 들어오면 오류가 발생한다.
+         * 이러한 오류는 컨트롤러 진입 전에 발생되어 400예외페이지가 띄워진다.
+         *
+         * 3. 2번에서 컨트롤러가 호출된다고 하더라도 다른타입을 저장할 공간이 없다. 사용자는 어떤값을 입력했었는지 알고 싶을 것이다.
+         *
+         */
+        Map<String, String> errors = new HashMap<>();
+
+        // 개별 필드 검증
+        if (!StringUtils.hasText(item.getItemName()))
+            errors.put("itemName", "상품이름은 필수입니다.");
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 100_000)
+            errors.put("price", "가격은 1000~100,000 범위가 합니다.");
+        if (item.getQuantity() == null || item.getQuantity() > 9999)
+            errors.put("quantity", "수량은 9,999까지 가능합니다.");
+
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                errors.put("globalError", "가격*수량 은 10,000 이상이어야 한다. 현재 값:" + retPrice);
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (!errors.isEmpty()) {
+            model.addAttribute("errors", errors);
+            return "validation/v1/addForm";
+        }
 
         Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
