@@ -6,9 +6,7 @@ import me.staek.itemservice.domain.item.Item;
 import me.staek.itemservice.domain.item.ItemRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,4 +40,36 @@ public class BasicItemController {
         return "basic/item";
     }
 
+    @GetMapping("/add")
+    public String item() {
+        return "basic/addForm";
+    }
+
+//    @PostMapping("/add")
+    public String save(@RequestParam String itemName
+            , @RequestParam Integer price
+            , @RequestParam Integer quantity
+            , Model model) {
+        model.addAttribute("item", repository.save(new Item(itemName, price, quantity)));
+        return "basic/item";
+    }
+
+    /**
+     * 인자로 ModelAttribute를 받으면, Model에 Item객체를 추가하지 않아도 유지된다.
+     */
+//    @PostMapping("/add")
+    public String save2(@ModelAttribute("item") Item item) {
+        repository.save(item);
+        return "basic/item";
+    }
+
+    /**
+     * @ModelAttribute를 생략해도 사용자 객체라면 자동 적용된다.
+     * (alias는 정할 수 없다 - 인자가그대로 키로 적용됨 (맨 앞글자만 소문자로 변경)
+     */
+    @PostMapping("/add")
+    public String save3(Item item) {
+        repository.save(item);
+        return "basic/item";
+    }
 }
