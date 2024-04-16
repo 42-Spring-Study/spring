@@ -7,6 +7,7 @@ import me.staek.itemservice.domain.item.ItemRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -32,6 +33,13 @@ public class BasicItemController {
         List<Item> items = repository.findAll();
         model.addAttribute("items", items);
         return "basic/items";
+    }
+
+    @GetMapping("/{itemId}")
+    public String item(@PathVariable Long itemId, Model model) {
+        Item finded = repository.findByItem(itemId);
+        model.addAttribute("item", finded);
+        return "basic/item";
     }
 
 }
