@@ -77,14 +77,12 @@ public class ValidationItemControllerV2 {
         return "validation/v2/addForm";
     }
 
-    @PostMapping("/add")
-    public String save5(Item item, BindingResult br, RedirectAttributes redirectAttributes, Model model) {
+//    @PostMapping("/add")
+    public String addItem1(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
         /**
-         *
+         * FieldError - 타입오류 발생시 400오류화면이 아닌 등록폼 화면을 유지하고 에러를 출력한다. (출력메세지는 스프링에서 제공)
          */
-        Map<String, String> errors = new HashMap<>();
-
         // 개별 필드 검증
         if (!StringUtils.hasText(item.getItemName()))
             br.addError(new FieldError("item", "itemName", "상품이름은 필수입니다."));
@@ -112,6 +110,46 @@ public class ValidationItemControllerV2 {
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v2/items/{itemId}";
     }
+
+    @PostMapping("/add")
+    public String addItem2(Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+
+        /**
+         * FieldError - 오류 발생시 사용자 입력 값을 저장하는 기능을 제공하는 생성자 사용 (rejectedValue)
+         * - th:field="*{price}" 는 정상상황일 때 전달된 객체를 사용하고, 오류발생 시 FieldError의 rejectedValue를 표출함.
+         *
+         * - 타입 오류로 바인딩에 실패하면 스프링은 FieldError 를 생성하면서 사용자가 입력한 값을 넣어둔다. 그리고 해당
+         *   오류를 BindingResult 에 담아서 컨트롤러를 호출한다.
+         *
+         */
+        // 개별 필드 검증
+        if (!StringUtils.hasText(item.getItemName()))
+            br.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품이름은 필수입니다."));
+
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 100_000)
+            br.addError(new FieldError("item","price", item.getPrice(), false, null, null, "가격은 1000~100,000 범위가 합니다."));
+        if (item.getQuantity() == null || item.getQuantity() > 9999)
+            br.addError(new FieldError("item", "quantity", item.getQuantity(), false, null, null, "수량은 9,999까지 가능합니다."));
+
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                br.addError(new ObjectError("item", null, null, "가격*수량 은 10,000 이상이어야 한다. 현재 값:" + retPrice));
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v2/addForm";
+        }
+
+        Item saved = repository.save(item);
+        redirectAttributes.addAttribute("itemId", saved.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
