@@ -26,15 +26,6 @@ public class FormItemController {
     private final ItemRepository repository;
 
     /**
-     * 테스트데이터
-     */
-    @PostConstruct
-    public void init() {
-        repository.save(new Item("testA", 10000, 10));
-        repository.save(new Item("testB", 20000, 20));
-    }
-
-    /**
      * 컨트롤러 클래스가 호출될 때마다 자동호출된다 (리팩토링 필요)
      */
     @ModelAttribute("regions")
