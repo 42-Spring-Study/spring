@@ -36,6 +36,7 @@ public class ItemRepository {
         item.setOpen(uptItem.isOpen());
         item.setItemType(uptItem.getItemType());
         item.setRegions(uptItem.getRegions());
+        item.setDeliveryCode(uptItem.getDeliveryCode());
     }
 
     public void clearStore() {

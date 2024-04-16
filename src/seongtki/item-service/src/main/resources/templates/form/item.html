@@ -69,11 +69,21 @@
             <input type="radio" th:field="${item.itemType}" th:value="${type.name()}" class="form-check-input" disabled>
             <label th:for="${#ids.prev('itemType')}" th:text="${type.description}"
                    class="form-check-label">
-                BOOK
             </label>
         </div>
     </div>
 
+    <hr class="my-4">
+
+    <!-- SELECT -->
+    <div>
+        <div>배송 방식</div>
+        <select th:field="${item.deliveryCode}" class="form-select" disabled>
+            <option value="">==배송 방식 선택==</option>
+            <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
+                    th:text="${deliveryCode.displayName}"></option>
+        </select>
+    </div>
     <hr class="my-4">
 
 
