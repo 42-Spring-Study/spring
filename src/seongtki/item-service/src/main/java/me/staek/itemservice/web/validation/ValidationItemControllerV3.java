@@ -2,10 +2,7 @@ package me.staek.itemservice.web.validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.staek.itemservice.domain.item.DeliveryCode;
-import me.staek.itemservice.domain.item.Item;
-import me.staek.itemservice.domain.item.ItemRepository;
-import me.staek.itemservice.domain.item.ItemType;
+import me.staek.itemservice.domain.item.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -108,8 +105,10 @@ public class ValidationItemControllerV3 {
      * ObjectError 검증로직
      * Domain에 @ScriptAssert를사용할 수 도 있지만, 여러 오브젝트를 결합하여 검증을 요구할 수도 있기에
      * 유연한 개발을 위해 자바코드로 작성하면 좋다.
+     *
+     *
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItem1(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
         // 복합 필드 검증
@@ -129,7 +128,38 @@ public class ValidationItemControllerV3 {
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v3/items/{itemId}";
-}
+    }
+
+    /**
+     * groups 추가
+     * 같은 도메인(Item.class)의 필드를 추가,수정할때 검증내용이 다를 수 있다.
+     * 이를 해결하기 위해 group에 해당하는 인터페이스를작성하고, Item에 정의하고, 컨트롤러에 사용할 그룹을 작성한다.
+     *
+     * 단점
+     * 복잡하다.
+     * @Valid는 groups를 적용할 수 있는 기능이 없다.
+     */
+    @PostMapping("/add")
+    public String addItem2(@Validated(SaveCheck.class)  Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v3/addForm";
+        }
+
+        Item saved = repository.save(item);
+        redirectAttributes.addAttribute("itemId", saved.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v3/items/{itemId}";
+    }
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
@@ -138,8 +168,44 @@ public class ValidationItemControllerV3 {
         return "validation/v3/editForm";
     }
 
+//    @PostMapping("/{itemId}/edit")
+    public String doEdit(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult br) {
+
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v3/editForm";
+        }
+
+
+        repository.update(itemId, item);
+        return "redirect:/validation/v3/items/{itemId}";
+    }
+
     @PostMapping("/{itemId}/edit")
-    public String doEdit(@PathVariable Long itemId, Item item) {
+    public String doEdit2(@PathVariable Long itemId, @Validated(UpdateCheck.class)  @ModelAttribute Item item, BindingResult br) {
+
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v3/editForm";
+        }
+
+
         repository.update(itemId, item);
         return "redirect:/validation/v3/items/{itemId}";
     }

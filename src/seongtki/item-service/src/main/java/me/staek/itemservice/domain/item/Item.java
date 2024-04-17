@@ -11,6 +11,7 @@ import java.util.List;
 
 @Data
 public class Item {
+    @NotNull(groups = UpdateCheck.class)
     private Long id;
 
     /**
@@ -19,7 +20,7 @@ public class Item {
      * NotBlank.java.lang.String
      * NotBlank
      */
-    @NotBlank(message = "필수값입니다.")
+    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class}, message = "필수값입니다.")
     private String itemName;
     /**
      * Range.item.price
@@ -27,9 +28,11 @@ public class Item {
      * Range.java.lang.Integer
      * Range
      */
-    @NotNull @Range(min = 1000, max = 100000)
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Range(min = 1000, max = 100000, groups = {SaveCheck.class, UpdateCheck.class})
     private Integer price;
-    @NotNull @Max(9999)
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Max(value = 9999, groups = {SaveCheck.class, UpdateCheck.class})
     private Integer quantity;
 
     /**
