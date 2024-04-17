@@ -1,14 +1,14 @@
-package me.staek.itemservice.web.item.form;
+package me.staek.itemservice.web.validation;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.staek.itemservice.domain.item.DeliveryCode;
-import me.staek.itemservice.domain.item.Item;
-import me.staek.itemservice.domain.item.ItemRepository;
-import me.staek.itemservice.domain.item.ItemType;
+import me.staek.itemservice.domain.item.*;
+import me.staek.itemservice.web.validation.dto.ItemSaveDto;
+import me.staek.itemservice.web.validation.dto.ItemUpdateDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -19,9 +19,9 @@ import java.util.Map;
 
 @Slf4j
 @Controller
-@RequestMapping("/form/items")
+@RequestMapping("/validation/v4/items")
 @RequiredArgsConstructor
-public class FormItemController {
+public class ValidationItemControllerV4 {
 
     private final ItemRepository repository;
 
@@ -61,63 +61,72 @@ public class FormItemController {
     public String items(Model model) {
         List<Item> items = repository.findAll();
         model.addAttribute("items", items);
-        return "form/items";
+        return "validation/v4/items";
     }
 
     @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model) {
         Item finded = repository.findByItem(itemId);
         model.addAttribute("item", finded);
-        return "form/item";
+        return "validation/v4/item";
     }
 
-    /**
-     * th:object 를 적용하기 위해 먼저 해당 오브젝트 정보를 넘겨준다.
-     * 등록 폼이기 때문에 데이터가 비어있는 빈 오브젝트를 만들어서 뷰에 전달한다.
-     */
     @GetMapping("/add")
     public String item(Model model) {
         model.addAttribute("item", new Item());
-        return "form/addForm";
+        return "validation/v4/addForm";
     }
 
     /**
-     * ** 단일 체크박스 **
-     * 체크박스의 open는 언체크 시 requestBody 에 없다. (브라우저에서 안보냄)
-     * 언체크 시 아래 로그에서는 확인가능함.(false)
-     * 체크하면 requestBody에 있다.
-     *
-     * 스프링부트 3.0이전버전은 _open 태그가 있어야 언체크 시 null 이 출력되는데
-     * 최신버전은 false로 잘 출력됨
-     *
-     *
-     * ** 다중 체크박스 로그 예시**
-     * 모두 언체크 하면 => item.regions=[]
-     * 체크하면 =>  item.regions=[SEOUL, BUSAN]
-     *
      */
     @PostMapping("/add")
-    public String save5(Item item, RedirectAttributes redirectAttributes) {
-        log.info("item.open={}", item.isOpen());
-        log.info("item.regions={}", item.getRegions());
-        log.info("item.itemType={}", item.getItemType());
+    public String addItem(@Validated @ModelAttribute("item") ItemSaveDto itemDto, BindingResult br, RedirectAttributes redirectAttributes) {
 
+        // 복합 필드 검증
+        if (itemDto.getPrice() != null && itemDto.getQuantity() != null) {
+            int retPrice = itemDto.getPrice() * itemDto.getQuantity();
+            if (retPrice < 10000)
+                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v4/addForm";
+        }
+
+        Item item = new Item(itemDto.getItemName(), itemDto.getPrice(), itemDto.getQuantity());
         Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/form/items/{itemId}";
+        return "redirect:/validation/v4/items/{itemId}";
     }
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
         Item finded = repository.findByItem(itemId);
         model.addAttribute("item", finded);
-        return "form/editForm";
+        return "validation/v4/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
-    public String doEdit(@PathVariable Long itemId, Item item) {
+    public String doEdit2(@PathVariable Long itemId, @Validated @ModelAttribute("item") ItemUpdateDto itemDto, BindingResult br) {
+
+        // 복합 필드 검증
+        if (itemDto.getPrice() != null && itemDto.getQuantity() != null) {
+            int retPrice = itemDto.getPrice() * itemDto.getQuantity();
+            if (retPrice < 10000)
+                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
+        }
+
+        // 검증 실패 시 입력폼으로 이동
+        if (br.hasErrors()) {
+            log.info("errors={}", br);
+            return "validation/v4/editForm";
+        }
+
+        Item item = new Item(itemDto.getItemName(), itemDto.getPrice(), itemDto.getQuantity());
         repository.update(itemId, item);
-        return "redirect:/form/items/{itemId}";
+        return "redirect:/validation/v4/items/{itemId}";
     }
 }

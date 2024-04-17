@@ -18,15 +18,6 @@ public class BasicItemController {
 
     private final ItemRepository repository;
 
-    /**
-     * 테스트데이터
-     */
-    @PostConstruct
-    public void init() {
-        repository.save(new Item("testA", 10000, 10));
-        repository.save(new Item("testB", 20000, 20));
-    }
-
     @GetMapping
     public String items(Model model) {
         List<Item> items = repository.findAll();
