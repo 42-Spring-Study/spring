@@ -3,6 +3,8 @@ package me.staek.itemservice.web.validation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.staek.itemservice.domain.item.*;
+import me.staek.itemservice.web.validation.dto.ItemSaveDto;
+import me.staek.itemservice.web.validation.dto.ItemUpdateDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -78,11 +80,11 @@ public class ValidationItemControllerV4 {
     /**
      */
     @PostMapping("/add")
-    public String addItem2(@Validated(SaveCheck.class)  Item item, BindingResult br, RedirectAttributes redirectAttributes) {
+    public String addItem(@Validated @ModelAttribute("item") ItemSaveDto itemDto, BindingResult br, RedirectAttributes redirectAttributes) {
 
         // 복합 필드 검증
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int retPrice = item.getPrice() * item.getQuantity();
+        if (itemDto.getPrice() != null && itemDto.getQuantity() != null) {
+            int retPrice = itemDto.getPrice() * itemDto.getQuantity();
             if (retPrice < 10000)
                 br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
         }
@@ -93,6 +95,7 @@ public class ValidationItemControllerV4 {
             return "validation/v4/addForm";
         }
 
+        Item item = new Item(itemDto.getItemName(), itemDto.getPrice(), itemDto.getQuantity());
         Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
@@ -106,33 +109,12 @@ public class ValidationItemControllerV4 {
         return "validation/v4/editForm";
     }
 
-//    @PostMapping("/{itemId}/edit")
-    public String doEdit(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult br) {
-
-        // 복합 필드 검증
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int retPrice = item.getPrice() * item.getQuantity();
-            if (retPrice < 10000)
-                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
-        }
-
-        // 검증 실패 시 입력폼으로 이동
-        if (br.hasErrors()) {
-            log.info("errors={}", br);
-            return "validation/v4/editForm";
-        }
-
-
-        repository.update(itemId, item);
-        return "redirect:/validation/v4/items/{itemId}";
-    }
-
     @PostMapping("/{itemId}/edit")
-    public String doEdit2(@PathVariable Long itemId, @Validated(UpdateCheck.class)  @ModelAttribute Item item, BindingResult br) {
+    public String doEdit2(@PathVariable Long itemId, @Validated @ModelAttribute("item") ItemUpdateDto itemDto, BindingResult br) {
 
         // 복합 필드 검증
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int retPrice = item.getPrice() * item.getQuantity();
+        if (itemDto.getPrice() != null && itemDto.getQuantity() != null) {
+            int retPrice = itemDto.getPrice() * itemDto.getQuantity();
             if (retPrice < 10000)
                 br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
         }
@@ -143,7 +125,7 @@ public class ValidationItemControllerV4 {
             return "validation/v4/editForm";
         }
 
-
+        Item item = new Item(itemDto.getItemName(), itemDto.getPrice(), itemDto.getQuantity());
         repository.update(itemId, item);
         return "redirect:/validation/v4/items/{itemId}";
     }
