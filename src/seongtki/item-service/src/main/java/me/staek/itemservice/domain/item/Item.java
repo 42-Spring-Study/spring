@@ -12,8 +12,21 @@ import java.util.List;
 @Data
 public class Item {
     private Long id;
-    @NotBlank
+
+    /**
+     * NotBlank.item.itemName
+     * NotBlank.itemName
+     * NotBlank.java.lang.String
+     * NotBlank
+     */
+    @NotBlank(message = "필수값입니다.")
     private String itemName;
+    /**
+     * Range.item.price
+     * Range.price
+     * Range.java.lang.Integer
+     * Range
+     */
     @NotNull @Range(min = 1000, max = 100000)
     private Integer price;
     @NotNull @Max(9999)

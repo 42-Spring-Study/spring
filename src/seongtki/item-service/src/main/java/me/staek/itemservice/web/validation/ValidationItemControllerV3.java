@@ -92,12 +92,18 @@ public class ValidationItemControllerV3 {
      * **검증순서
      * @ModelAttribute 각각의 필드에 타입 변환 시도
      * 1. 바인딩에 성공하면 다음로직으로이동 (실패하면 typeMismatch 로 FieldError 추가)
-     * 3. BeanValidation 적용
+     * 2. BeanValidation 적용
      *
      *
      * 예시)
      * 1. itemName 에 문자 "A" 입력 타입 변환 성공 itemName 필드에 BeanValidation 적용
      * 2. price 에 문자 "A" 입력 "A"를 숫자 타입 변환 시도 실패 typeMismatch FieldError 추가 price 필드는 BeanValidation 적용 X
+     *
+     *
+     * BeanValidation 메시지 찾는 순서
+     * 1. 생성된 메시지 코드 순서대로 messageSource 에서 메시지 찾기
+     * 2. 애노테이션의 message 속성 사용 @NotBlank(message = "공백! {0}")
+     * 3. 라이브러리가 제공하는 기본 값 사용 공백일 수 없습니다.
      */
     @PostMapping("/add")
     public String addItem1(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
@@ -108,11 +114,11 @@ public class ValidationItemControllerV3 {
             return "validation/v3/addForm";
         }
 
-        Item saved = repository.save(item);
+    Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v3/items/{itemId}";
-    }
+}
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
