@@ -104,6 +104,10 @@ public class ValidationItemControllerV3 {
      * 1. 생성된 메시지 코드 순서대로 messageSource 에서 메시지 찾기
      * 2. 애노테이션의 message 속성 사용 @NotBlank(message = "공백! {0}")
      * 3. 라이브러리가 제공하는 기본 값 사용 공백일 수 없습니다.
+     *
+     * ObjectError 검증로직
+     * Domain에 @ScriptAssert를사용할 수 도 있지만, 여러 오브젝트를 결합하여 검증을 요구할 수도 있기에
+     * 유연한 개발을 위해 자바코드로 작성하면 좋다.
      */
     @PostMapping("/add")
     public String addItem1(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
