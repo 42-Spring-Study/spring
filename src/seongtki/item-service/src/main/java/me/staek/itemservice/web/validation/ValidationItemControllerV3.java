@@ -108,13 +108,20 @@ public class ValidationItemControllerV3 {
     @PostMapping("/add")
     public String addItem1(@Validated Item item, BindingResult br, RedirectAttributes redirectAttributes) {
 
+        // 복합 필드 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int retPrice = item.getPrice() * item.getQuantity();
+            if (retPrice < 10000)
+                br.reject("totalPriceMin", new Object[]{10000, retPrice}, null);
+        }
+
         // 검증 실패 시 입력폼으로 이동
         if (br.hasErrors()) {
             log.info("errors={}", br);
             return "validation/v3/addForm";
         }
 
-    Item saved = repository.save(item);
+        Item saved = repository.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v3/items/{itemId}";
