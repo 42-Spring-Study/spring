@@ -2,7 +2,9 @@ package hello.login.web.login;
 
 import hello.login.domain.login.LoginService;
 import hello.login.domain.member.Member;
+import hello.login.web.session.SessionManager;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class LoginController {
         return "login/loginForm";
     }
 
-    @PostMapping
+    //@PostMapping
     public String login(@Valid @ModelAttribute LoginForm loginForm, BindingResult result, HttpServletResponse response) {
         if (result.hasErrors()) {
             return "login/loginForm";
@@ -64,6 +66,22 @@ public class LoginController {
         Cookie idCookie = new Cookie("memberId", String.valueOf(loginMember.getId()));
         //응답에 직접 넣어준다
         response.addCookie(idCookie);
+        return "redirect:/";
+    }
+
+    private final SessionManager sessionManager;
+    @PostMapping
+    public String loginV2(@Valid @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletResponse response) {
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+        Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+        if (loginMember == null){
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+        }
+
+        // 세션 생성
+        sessionManager.createSession(loginMember, response);
         return "redirect:/";
     }
 }
