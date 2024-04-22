@@ -2,10 +2,12 @@ package hello.login.web.login;
 
 import hello.login.domain.login.LoginService;
 import hello.login.domain.member.Member;
+import hello.login.web.SessionConst;
 import hello.login.web.session.SessionManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +72,7 @@ public class LoginController {
     }
 
     private final SessionManager sessionManager;
-    @PostMapping
+    //@PostMapping
     public String loginV2(@Valid @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return "login/loginForm";
@@ -82,6 +84,26 @@ public class LoginController {
 
         // 세션 생성
         sessionManager.createSession(loginMember, response);
+        return "redirect:/";
+    }
+
+    @PostMapping
+    public String loginV3(@Valid @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+        Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+        if (loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+
+
+        //NOTE: ????????????????????????????????????????????????//
+        //NOTE: 브라우저에서 세션쿠키 삭제 후 전송 시 브라우저가 쿠키 지원 x 판단 => ;jsessionid를 url에 붙여 Response 전송 => 바뀐 스프링 매핑 전략으로 인해 404 Error 발생
+        HttpSession session = request.getSession();
+        log.info("session={}", session);
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
         return "redirect:/";
     }
 }

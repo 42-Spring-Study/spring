@@ -6,6 +6,7 @@ import hello.login.web.session.SessionManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -59,9 +60,9 @@ public class HomeController {
 
     private final SessionManager sessionManager;
 
-    @GetMapping
+    //@GetMapping
     public String homeV2(HttpServletRequest request, Model model) {
-        Member member = (Member)sessionManager.getSession(request);
+        Member member = (Member) sessionManager.getSession(request);
         if (member == null) {
             return "home";
         }
@@ -70,9 +71,35 @@ public class HomeController {
         return "loginHome";
     }
 
-    @PostMapping("/logout")
+    //@PostMapping("/logout")
     public String logoutV2(HttpServletRequest request) {
         sessionManager.expire(request);
+        return "redirect:/";
+    }
+
+    @GetMapping
+    public String homeV3(HttpServletRequest request, Model model) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "home";
+        }
+        Member member = (Member)session.getAttribute(SessionConst.LOGIN_MEMBER);
+        if (member == null) {
+            return "home";
+        }
+        model.addAttribute("member", member);
+        return "loginHome";
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            log.info("logout failed");
+            session.invalidate();
+        }
+        //NOTE: jsessionid 쿠키 삭제 후 로그아웃 요청시에도 호출... WHY????????
+        log.info("logout success");
         return "redirect:/";
     }
 }
