@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -87,7 +84,7 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @PostMapping
+    //@PostMapping
     public String loginV3(@Valid @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return "login/loginForm";
@@ -105,5 +102,20 @@ public class LoginController {
         log.info("session={}", session);
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
         return "redirect:/";
+    }
+
+    @PostMapping
+    public String loginV4(@RequestParam(defaultValue = "/") String redirectURL, @Valid @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+        Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+        if (loginMember == null){
+            bindingResult.reject("loginFail", "아이디 혹은 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+        return "redirect:" + redirectURL;
     }
 }
