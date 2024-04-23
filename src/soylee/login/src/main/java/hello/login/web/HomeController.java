@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -77,7 +78,7 @@ public class HomeController {
         return "redirect:/";
     }
 
-    @GetMapping
+    //@GetMapping
     public String homeV3(HttpServletRequest request, Model model) {
         log.info("home Controller");
         HttpSession session = request.getSession(false);
@@ -102,5 +103,16 @@ public class HomeController {
         //NOTE: jsessionid 쿠키 삭제 후 로그아웃 요청시에도 호출... WHY????????
         log.info("logout success");
         return "redirect:/";
+    }
+
+    @GetMapping
+    public String homeLoginV3ArgumentResolver(@Login Member loginMember, Model model){
+        log.info("homeLoginV3ArgumentResolver: {}", loginMember);
+        //NOTE: request에서 세션 직접 가져오는 부분 삭제
+        if (loginMember == null) {
+            return "home";
+        }
+        model.addAttribute("member", loginMember);
+        return "loginHome";
     }
 }
