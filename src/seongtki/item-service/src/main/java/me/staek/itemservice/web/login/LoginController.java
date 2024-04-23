@@ -1,6 +1,8 @@
 package me.staek.itemservice.web.login;
 
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.staek.itemservice.domain.login.LoginService;
@@ -26,8 +28,15 @@ public class LoginController {
         return "login/loginForm";
     }
 
+
+    /**
+     *
+     * 로그인 성공 시 Response 쿠키에 MemberId 세팅
+     */
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute LoginDto loginDto, BindingResult br) {
+    public String login(@Validated @ModelAttribute LoginDto loginDto
+                        , BindingResult br
+                        , HttpServletResponse response) {
         if (br.hasErrors()) {
             return "login/loginForm";
         }
@@ -38,6 +47,7 @@ public class LoginController {
             br.reject("loginFail", "아이디 혹은 비번이 틀렸습니다.");
             return "login/loginForm";
         }
+        response.addCookie(new Cookie("memberId", String.valueOf(logined.getId())));
         return "redirect:/";
     }
 }
