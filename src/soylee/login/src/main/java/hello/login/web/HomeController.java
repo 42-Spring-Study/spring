@@ -79,6 +79,7 @@ public class HomeController {
 
     @GetMapping
     public String homeV3(HttpServletRequest request, Model model) {
+        log.info("home Controller");
         HttpSession session = request.getSession(false);
         if (session == null) {
             return "home";
