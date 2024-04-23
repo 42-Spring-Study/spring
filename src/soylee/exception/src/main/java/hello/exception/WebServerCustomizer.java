@@ -1,6 +1,7 @@
 package hello.exception;
 
 import hello.exception.filter.LogFilter;
+import hello.exception.interceptor.LogInterceptor;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import lombok.extern.java.Log;
@@ -11,9 +12,11 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Component
-public class WebServerCustomizer implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
+//@Component
+public class WebServerCustomizer implements WebServerFactoryCustomizer<ConfigurableWebServerFactory>, WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<Filter> logFilter(){
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
@@ -22,6 +25,15 @@ public class WebServerCustomizer implements WebServerFactoryCustomizer<Configura
         filterRegistrationBean.setDispatcherTypes(DispatcherType.ERROR, DispatcherType.REQUEST);
         return filterRegistrationBean;
     }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "/*.ico", "/error", "/error-page/**");
+    }
+
     @Override
     public void customize(ConfigurableWebServerFactory factory) {
         ErrorPage errorPage404 = new ErrorPage(HttpStatus.NOT_FOUND, "/error-page/404");
