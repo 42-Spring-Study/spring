@@ -12,16 +12,19 @@ import java.io.IOException;
 public class ServletExController {
     @GetMapping("/error-ex")
     public void errorEx() {
+        log.info("errorEx controller");
         throw new RuntimeException("Error occurred!!!");
     }
 
     @GetMapping("/error-404")
     public void error404(HttpServletResponse response) throws IOException {
+        log.info("error404 controller");
         response.sendError(404, "404 error!");
     }
 
-    @GetMapping("/error-400")
-    public void error400(HttpServletResponse response) throws IOException {
-        response.sendError(400);
+    @GetMapping("/error-500")
+    public void error500(HttpServletResponse response) throws IOException {
+        log.info("error500 controller");
+        response.sendError(500);
     }
 }
