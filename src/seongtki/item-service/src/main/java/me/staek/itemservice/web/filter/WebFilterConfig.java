@@ -3,6 +3,7 @@ package me.staek.itemservice.web.filter;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import me.staek.exception.resolver.MyHandlerExceptionResolver;
+import me.staek.exception.resolver.UserHandlerExceptionResolver;
 import me.staek.itemservice.argumentresolver.LoginMemberArgumentResolver;
 import me.staek.itemservice.interceptor.LogInterceptor;
 import me.staek.itemservice.interceptor.LoginCheckInterceptor;
@@ -96,5 +97,6 @@ public class WebFilterConfig implements WebMvcConfigurer {
     @Override
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         resolvers.add(new MyHandlerExceptionResolver());
+        resolvers.add(new UserHandlerExceptionResolver());
     }
 }
