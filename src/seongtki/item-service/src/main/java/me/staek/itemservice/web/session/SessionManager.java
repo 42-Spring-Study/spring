@@ -37,8 +37,10 @@ public class SessionManager {
 
     private static Cookie findCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
+        if (cookies == null)
+            return null;
         Cookie cookie = Arrays.stream(cookies)
-                                .filter(f -> f.getName().equals(SESSION_COOKIE_NAME))
+                                .filter(f -> SESSION_COOKIE_NAME.equals(f.getName()))
                                 .findAny().orElse(null);
         return cookie;
     }

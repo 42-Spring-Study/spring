@@ -4,10 +4,12 @@ package me.staek.itemservice.web.login;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.staek.itemservice.domain.login.LoginService;
 import me.staek.itemservice.domain.member.Member;
+import me.staek.itemservice.web.session.SessionConst;
 import me.staek.itemservice.web.session.SessionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -60,7 +62,7 @@ public class LoginController {
      *
      * 세션에 회원데이터 저장
      */
-    @PostMapping("/login")
+//    @PostMapping("/login")
     public String login2(@Validated @ModelAttribute LoginDto loginDto
             , BindingResult br
             , HttpServletResponse response) {
@@ -81,6 +83,30 @@ public class LoginController {
         return "redirect:/";
     }
 
+    /**
+     * HttpSession 를 이용해서 세션을 관리
+     */
+    @PostMapping("/login")
+    public String login3(@Validated @ModelAttribute LoginDto form, BindingResult
+            bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        log.info("login? {}", loginMember);
+        if (loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 혹은 비번이 틀렸습니다.");
+            return "login/loginForm";
+        }
+        /**
+         * 세션이 있으면 있는 세션 반환, 없으면 신규 세션 생성
+         */
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+        return "redirect:/";
+    }
+
+
 
     /**
      * 로그아웃 시 쿠키초기화
@@ -94,7 +120,7 @@ public class LoginController {
     /**
      * 로그아웃 시 세션만료
      */
-    @PostMapping("/logout")
+//    @PostMapping("/logout")
     public String logout2(HttpServletRequest request) {
         sessionManager.expire(request);
         return "redirect:/";
@@ -104,5 +130,14 @@ public class LoginController {
         Cookie cookie = new Cookie(cookieName, null);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+    }
+
+    @PostMapping("/logout")
+    public String logout3(HttpServletRequest request) {
+        // 세션을 삭제
+        HttpSession session = request.getSession(false);
+        if (session != null)
+            session.invalidate();
+        return "redirect:/";
     }
 }
