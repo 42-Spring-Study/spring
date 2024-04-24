@@ -102,6 +102,7 @@ public class LoginController {
          * 세션이 있으면 있는 세션 반환, 없으면 신규 세션 생성
          */
         HttpSession session = request.getSession();
+//        session.setMaxInactiveInterval(1800); // 1800 sec
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
         return "redirect:/";
     }
