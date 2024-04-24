@@ -11,10 +11,7 @@ import me.staek.exception.exception.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
@@ -97,6 +94,8 @@ public class ApiExceptionController {
 
 
     /**
+     * ResponseStatusException 사용
+     *
      * @ResponseStatus 는 개발자가 직접 에러코드를 수정할 수 없는 상황이 있어 제약이 있는데,
      * 대안으로 아래처럼 사용할 수 있다.
      */
@@ -104,5 +103,17 @@ public class ApiExceptionController {
     public String responseStatusEx2() {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "error.bad", new
                 IllegalArgumentException());
+    }
+
+
+    /**
+     * DefaultHandlerExceptionResolver 사용
+     * - TypeMismatchException 등의 스프링 내부 예외 처리를 수행함
+     *
+     * http://localhost:8080/api/default-handler-ex?data=hello&message
+     */
+    @GetMapping("/api/default-handler-ex")
+    public String defaultException(@RequestParam Integer data) {
+        return "ok";
     }
 }
