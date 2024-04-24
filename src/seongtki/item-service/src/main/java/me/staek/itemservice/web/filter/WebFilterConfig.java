@@ -2,6 +2,7 @@ package me.staek.itemservice.web.filter;
 
 import jakarta.servlet.Filter;
 import me.staek.itemservice.interceptor.LogInterceptor;
+import me.staek.itemservice.interceptor.LoginCheckInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,7 @@ public class WebFilterConfig implements WebMvcConfigurer {
      * <p>
      * @ServletComponentScan @WebFilter(filterName = "logFilter", urlPatterns = "/*") 로 필터 등록이 가능하지만 필터 순서 조절이 안된다.
      */
-    @Bean
+//    @Bean
     public FilterRegistrationBean logFilter() {
         FilterRegistrationBean<Filter> bean = new FilterRegistrationBean<>();
         bean.setFilter(new LogFilter());
@@ -27,7 +28,7 @@ public class WebFilterConfig implements WebMvcConfigurer {
         return bean;
     }
 
-    @Bean
+//    @Bean
     public FilterRegistrationBean loginCheckFilter() {
         FilterRegistrationBean<Filter> bean = new
                 FilterRegistrationBean<>();
@@ -43,9 +44,19 @@ public class WebFilterConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 로그
         registry.addInterceptor(new LogInterceptor())
                 .order(1)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/css/**", "/*.ico", "/error");
+
+        // 로그인 체크
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2)
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                        "/", "/members/add", "/login", "/logout",
+                        "/css/**", "/*.ico", "/error"
+                );
     }
 }
