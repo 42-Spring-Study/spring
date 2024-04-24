@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,5 +93,16 @@ public class ApiExceptionController {
     @GetMapping("/api/response-status-ex1")
     public String responseStatusEx1() {
         throw new BadRequestException();
+    }
+
+
+    /**
+     * @ResponseStatus 는 개발자가 직접 에러코드를 수정할 수 없는 상황이 있어 제약이 있는데,
+     * 대안으로 아래처럼 사용할 수 있다.
+     */
+    @GetMapping("/api/response-status-ex2")
+    public String responseStatusEx2() {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "error.bad", new
+                IllegalArgumentException());
     }
 }
