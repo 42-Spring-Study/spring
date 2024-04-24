@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import me.staek.exception.exception.BadRequestException;
 import me.staek.exception.exception.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,6 +43,7 @@ public class ApiExceptionController {
         if (id.equals("user-ex")) {
             throw new UserException("사용자 오류");
         }
+
 
         return new MemberDto(id, "hello " + id);
     }
@@ -80,5 +82,15 @@ public class ApiExceptionController {
         Integer statusCode = (Integer)
                 request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         return new ResponseEntity(result, HttpStatus.valueOf(statusCode));
+    }
+
+    /**
+     * ResponseStatusExceptionResolver 가 발생한 예외의
+     * @ResponseStatus 를 확인해서 오류코드를 조정한다.
+     * - (response.sendError(statusCode, resolvedReason) 호출하는 식으로 조정함)
+     */
+    @GetMapping("/api/response-status-ex1")
+    public String responseStatusEx1() {
+        throw new BadRequestException();
     }
 }
