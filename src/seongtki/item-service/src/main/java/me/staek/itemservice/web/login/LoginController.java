@@ -14,10 +14,7 @@ import me.staek.itemservice.web.session.SessionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -73,7 +70,7 @@ public class LoginController {
         Member logined = loginService.login(loginDto.getLoginId(), loginDto.getPassword());
 
         if (logined == null) {
-            br.reject("loginFail", "아이디 혹은 비번이 틀렸습니다.");
+            br.reject("loginFail");
             return "login/loginForm";
         }
         /**
@@ -85,17 +82,18 @@ public class LoginController {
 
     /**
      * HttpSession 를 이용해서 세션을 관리
+     * - 무조건 home화면으로 이동한다.
      */
-    @PostMapping("/login")
+//    @PostMapping("/login")
     public String login3(@Validated @ModelAttribute LoginDto form, BindingResult
-            bindingResult, HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
+            br, HttpServletRequest request) {
+        if (br.hasErrors()) {
             return "login/loginForm";
         }
         Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
         log.info("login? {}", loginMember);
         if (loginMember == null) {
-            bindingResult.reject("loginFail", "아이디 혹은 비번이 틀렸습니다.");
+            br.reject("loginFail");
             return "login/loginForm";
         }
         /**
@@ -105,6 +103,35 @@ public class LoginController {
 //        session.setMaxInactiveInterval(1800); // 1800 sec
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
         return "redirect:/";
+    }
+
+
+    /**
+     * 로그인 이후 redirect 처리
+     * - 이미 로그인이 되어있거나 로그인이전에 요청했던 url에 로그인체크 성공 후 redirect한다.
+     */
+    @PostMapping("/login")
+    public String login4(
+            @Validated @ModelAttribute LoginDto form, BindingResult br,
+            @RequestParam(defaultValue = "/") String redirectURL, HttpServletRequest request) {
+
+        if (br.hasErrors()) {
+            return "login/loginForm";
+        }
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        log.info("login? {}", loginMember);
+        if (loginMember == null) {
+            br.reject("loginFail");
+            return "login/loginForm";
+        }
+
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+
+        /**
+         * redirectURL 적용
+         */
+        return "redirect:" + redirectURL;
     }
 
 
