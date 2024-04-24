@@ -35,4 +35,32 @@ public class ApiExceptionController {
     }
 
 
+    public static final String ERROR_EXCEPTION = "jakarta.servlet.error.exception";
+    public static final String ERROR_EXCEPTION_TYPE = "jakarta.servlet.error.exception_type";
+    public static final String ERROR_MESSAGE = "jakarta.servlet.error.message";
+    public static final String ERROR_REQUEST_URI = "jakarta.servlet.error.request_uri";
+    public static final String ERROR_SERVLET_NAME = "jakarta.servlet.error.servlet_name";
+    public static final String ERROR_STATUS_CODE = "jakarta.servlet.error.status_code";
+
+
+    /**
+     * WebServerCustomizer에서 매핑한 에러코드에 대한 메서드가 아래결로 호출된다. (ServletExController 에 같은 url매핑이 있지만 produces로 구분된다)
+     * <p>
+     * produces = MediaType.APPLICATION_JSON_VALUE
+     * => 클라이언트가 요청하는 HTTP Header의 Accept 의 값이 application/json 일 때 해당 메서드가 호출됨
+     * => 클라어인트가 받고 싶은 미디어 타입이 json이면 해당 컨트롤러의 메서드가 호출된다.
+     * => ResponseEntity 를 사용해서 응답하기 때문에 메시지 컨버터가 동작하면서 클라이언트에 JSON이 반환된다
+     */
+    @RequestMapping(value = "/error-page/500", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> errorPage500Api(HttpServletRequest
+                                                                       request, HttpServletResponse response) {
+        log.info("API errorPage 500");
+        Map<String, Object> result = new HashMap<>();
+        Exception ex = (Exception) request.getAttribute(ERROR_EXCEPTION);
+        result.put("status", request.getAttribute(ERROR_STATUS_CODE));
+        result.put("message", ex.getMessage());
+        Integer statusCode = (Integer)
+                request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        return new ResponseEntity(result, HttpStatus.valueOf(statusCode));
+    }
 }
