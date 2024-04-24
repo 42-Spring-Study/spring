@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * BasicErrorController 라는 스프링 컨트롤러를 자동으로 등록한다. (ErrorPage 에서 등록한 /error 를 매핑해서 처리하는 컨트롤러다.)
  * *** 스프링 부트가 제공하는 기본 오류 메커니즘을 사용하도록 WebServerCustomizer에 있는 @Component 를 주석처리해야한다.
  */
-//@Component
+@Component
 public class WebServerCustomizer implements
         WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
     @Override

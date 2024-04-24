@@ -61,21 +61,21 @@ public class WebFilterConfig implements WebMvcConfigurer {
          * 오류발생 인터셉터는 경로 정보로 중복 호출 제거( excludePathPatterns("/error-page/**") 가능하다.
          */
         // 로그
-        registry.addInterceptor(new LogInterceptor())
-                .order(1)
-                .addPathPatterns("/**")
-//                .excludePathPatterns("/css/**", "/*.ico", "/error", "/error-page/**");
-                .excludePathPatterns("/css/**", "/*.ico", "/error");
+//        registry.addInterceptor(new LogInterceptor())
+//                .order(1)
+//                .addPathPatterns("/**")
+////                .excludePathPatterns("/css/**", "/*.ico", "/error", "/error-page/**");
+//                .excludePathPatterns("/css/**", "/*.ico", "/error");
 
 
         // 로그인 체크
-        registry.addInterceptor(new LoginCheckInterceptor())
-                .order(2)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/", "/members/add", "/login", "/logout",
-                        "/css/**", "/*.ico", "/error"
-                );
+//        registry.addInterceptor(new LoginCheckInterceptor())
+//                .order(2)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(
+//                        "/", "/members/add", "/login", "/logout",
+//                        "/css/**", "/*.ico", "/error"
+//                );
     }
 
     /**
