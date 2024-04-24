@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 public class Member {
     private Long id;
 
+    public Member() {
+
+    }
     public Member(String loginId, String password, String name) {
         this.loginId = loginId;
         this.password = password;

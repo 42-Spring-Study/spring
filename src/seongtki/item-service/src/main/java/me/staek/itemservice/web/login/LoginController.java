@@ -50,4 +50,17 @@ public class LoginController {
         response.addCookie(new Cookie("memberId", String.valueOf(logined.getId())));
         return "redirect:/";
     }
+
+
+    @PostMapping("/logout")
+    public String logout(HttpServletResponse response) {
+        clearCookie(response, "memberId");
+        return "redirect:/";
+    }
+
+    private static void clearCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
 }
