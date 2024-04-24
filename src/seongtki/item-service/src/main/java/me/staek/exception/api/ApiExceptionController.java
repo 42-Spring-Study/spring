@@ -25,6 +25,16 @@ public class ApiExceptionController {
         if (id.equals("ex")) {
             throw new RuntimeException("잘못된 사용자");
         }
+
+        /**
+         * @IllegalArgumentException
+         * http://localhost:8080/api/members/bad 호출 시 500코드가 반환됨을 알 수 있다.
+         * 예외코드 변경을 위해 HandlerExceptionResolver를 이용할 수 있다.
+         */
+        if (id.equals("bad")) {
+            throw new IllegalArgumentException("잘못된 입력 값");
+        }
+
         return new MemberDto(id, "hello " + id);
     }
     @Data

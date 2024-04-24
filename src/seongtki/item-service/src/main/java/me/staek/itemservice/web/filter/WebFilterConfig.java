@@ -2,6 +2,7 @@ package me.staek.itemservice.web.filter;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
+import me.staek.exception.resolver.MyHandlerExceptionResolver;
 import me.staek.itemservice.argumentresolver.LoginMemberArgumentResolver;
 import me.staek.itemservice.interceptor.LogInterceptor;
 import me.staek.itemservice.interceptor.LoginCheckInterceptor;
@@ -9,6 +10,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -84,5 +86,15 @@ public class WebFilterConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new LoginMemberArgumentResolver());
+    }
+
+
+    /**
+     * HandlerExceptionResolver 추가
+     * - 기본 설정을 유지하면서 추가됨
+     */
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        resolvers.add(new MyHandlerExceptionResolver());
     }
 }
