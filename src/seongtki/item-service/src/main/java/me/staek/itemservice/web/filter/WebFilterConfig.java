@@ -1,6 +1,9 @@
 package me.staek.itemservice.web.filter;
 
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
+import me.staek.exception.resolver.MyHandlerExceptionResolver;
+import me.staek.exception.resolver.UserHandlerExceptionResolver;
 import me.staek.itemservice.argumentresolver.LoginMemberArgumentResolver;
 import me.staek.itemservice.interceptor.LogInterceptor;
 import me.staek.itemservice.interceptor.LoginCheckInterceptor;
@@ -8,6 +11,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -28,6 +32,13 @@ public class WebFilterConfig implements WebMvcConfigurer {
         FilterRegistrationBean<Filter> bean = new FilterRegistrationBean<>();
         bean.setFilter(new LogFilter());
         bean.setOrder(1);
+        /**
+         * 두 가지를 모두 넣으면 클라이언트 요청,오류 페이지 요청에서도 필터 모두 호출됨.
+         * 아무것도 넣지 않으면 기본 값이 DispatcherType.REQUEST 이다.( 클라이언트의 요청이 있는 경우에만 필터적용)
+         * (오류 페이지 요청 전용 필터를 적용하고 싶으면 DispatcherType.ERROR 만 지정하면 된다)
+         */
+        bean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ERROR);
+//        bean.setDispatcherTypes(DispatcherType.REQUEST);
         bean.addUrlPatterns("/*");
         return bean;
     }
@@ -48,20 +59,26 @@ public class WebFilterConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        /**
+         *
+         * 오류발생 인터셉터는 경로 정보로 중복 호출 제거( excludePathPatterns("/error-page/**") 가능하다.
+         */
         // 로그
-        registry.addInterceptor(new LogInterceptor())
-                .order(1)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/css/**", "/*.ico", "/error");
+//        registry.addInterceptor(new LogInterceptor())
+//                .order(1)
+//                .addPathPatterns("/**")
+////                .excludePathPatterns("/css/**", "/*.ico", "/error", "/error-page/**");
+//                .excludePathPatterns("/css/**", "/*.ico", "/error");
+
 
         // 로그인 체크
-        registry.addInterceptor(new LoginCheckInterceptor())
-                .order(2)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/", "/members/add", "/login", "/logout",
-                        "/css/**", "/*.ico", "/error"
-                );
+//        registry.addInterceptor(new LoginCheckInterceptor())
+//                .order(2)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(
+//                        "/", "/members/add", "/login", "/logout",
+//                        "/css/**", "/*.ico", "/error"
+//                );
     }
 
     /**
@@ -70,5 +87,16 @@ public class WebFilterConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new LoginMemberArgumentResolver());
+    }
+
+
+    /**
+     * HandlerExceptionResolver 추가
+     * - 기본 설정을 유지하면서 추가됨
+     */
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        resolvers.add(new MyHandlerExceptionResolver());
+        resolvers.add(new UserHandlerExceptionResolver());
     }
 }
