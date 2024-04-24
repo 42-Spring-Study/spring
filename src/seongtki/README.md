@@ -67,8 +67,18 @@
     me.staek.itemservice.web.validation.ValidationItemControllerV4
     me.staek.itemservice.web.validation.ValidationItemControllerAPI
     ```
+  
+- MVC2 섹션6 로그인 처리1 - 쿠키, 세션
 
+  - 쿠키, 세션 처리로직 작성
+  - 
 
+- MVC2 섹션7 로그인 처리2 - 필터, 인터셉터
 
+- MVC2 섹션8 예외 처리와 오류 페이지
 
+- MVC2 섹션9 API 예외 처리
 
+- MVC2 섹션10 스프링 타입 컨버터
+
+- MVC2 섹션11 파일 업로드
