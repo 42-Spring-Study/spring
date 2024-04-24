@@ -3,6 +3,7 @@ package me.staek.itemservice.web.login;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import me.staek.itemservice.argumentresolver.Login;
 import me.staek.itemservice.domain.login.LoginService;
 import me.staek.itemservice.domain.member.Member;
 import me.staek.itemservice.domain.member.MemberRepository;
@@ -51,7 +52,7 @@ public class HomeController {
         return "loginedHome";
     }
 
-    @GetMapping("/")
+//    @GetMapping("/")
     public String homeLogin3(HttpServletRequest request, Model model) {
         /**
          * 세션존재 유무 검사
@@ -67,6 +68,21 @@ public class HomeController {
         if (loginMember == null)
             return "home";
 
+        model.addAttribute("member", loginMember);
+        return "loginedHome";
+    }
+
+    /**
+     * @Login 애노테이션이 있으면 직접 만든 ArgumentResolver 가 동작해서 자동으로 세션에 있는
+     * 로그인 회원을 찾아서 객체에 주입된다.
+     */
+    @GetMapping("/")
+    public String homeLogin3ArgumentResolver(@Login Member loginMember, Model model) {
+        //세션에 회원 데이터가 없으면 home
+        if (loginMember == null) {
+            return "home";
+        }
+        //세션이 유지되면 로그인으로 이동
         model.addAttribute("member", loginMember);
         return "loginedHome";
     }

@@ -1,13 +1,17 @@
 package me.staek.itemservice.web.filter;
 
 import jakarta.servlet.Filter;
+import me.staek.itemservice.argumentresolver.LoginMemberArgumentResolver;
 import me.staek.itemservice.interceptor.LogInterceptor;
 import me.staek.itemservice.interceptor.LoginCheckInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 public class WebFilterConfig implements WebMvcConfigurer {
@@ -58,5 +62,13 @@ public class WebFilterConfig implements WebMvcConfigurer {
                         "/", "/members/add", "/login", "/logout",
                         "/css/**", "/*.ico", "/error"
                 );
+    }
+
+    /**
+     * 로그인 체크 argumentResolver
+     */
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new LoginMemberArgumentResolver());
     }
 }
