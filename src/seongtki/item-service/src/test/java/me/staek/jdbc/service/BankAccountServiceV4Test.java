@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import me.staek.jdbc.BankAccount;
 import me.staek.jdbc.repository.AccountRepository;
 import me.staek.jdbc.repository.BankAccountRepositoryV4_1;
+import me.staek.jdbc.repository.BankAccountRepositoryV4_2;
+import me.staek.jdbc.repository.BankAccountRepositoryV5;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,9 +51,9 @@ class BankAccountServiceV4Test {
 
         @Bean
         AccountRepository accountRepository() {
-            return new BankAccountRepositoryV4_1(dataSource);
+//            return new BankAccountRepositoryV4_1(dataSource);
 //            return new BankAccountRepositoryV4_2(dataSource);
-//            return new BankAccountRepositoryV5(dataSource);
+            return new BankAccountRepositoryV5(dataSource);
         }
 
         @Bean
