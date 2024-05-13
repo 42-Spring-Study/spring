@@ -1,21 +1,16 @@
 package me.staek.itemservice.web.item.form;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.staek.itemservice.domain.item.DeliveryCode;
-import me.staek.itemservice.domain.item.Item;
-import me.staek.itemservice.domain.item.ItemRepository;
-import me.staek.itemservice.domain.item.ItemType;
+import me.staek.itemservice.domain.item.*;
+import me.staek.itemservice.web.validation.dto.ItemSearchCond;
+import me.staek.itemservice.web.validation.dto.ItemUpdateDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -23,7 +18,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FormItemController {
 
-    private final ItemRepository repository;
+    private final ItemService itemService;
+
 
     /**
      * 컨트롤러 클래스가 호출될 때마다 자동호출된다 (리팩토링 필요)
@@ -58,16 +54,16 @@ public class FormItemController {
     }
 
     @GetMapping
-    public String items(Model model) {
-        List<Item> items = repository.findAll();
+    public String items(@ModelAttribute("itemSearch") ItemSearchCond itemSearch, Model model) {
+        List<Item> items = itemService.findItems(itemSearch);
         model.addAttribute("items", items);
         return "form/items";
     }
 
     @GetMapping("/{itemId}")
-    public String item(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
-        model.addAttribute("item", finded);
+    public String item(@PathVariable long itemId, Model model) {
+        Item item = itemService.findById(itemId).get();
+        model.addAttribute("item", item);
         return "form/item";
     }
 
@@ -102,7 +98,7 @@ public class FormItemController {
         log.info("item.regions={}", item.getRegions());
         log.info("item.itemType={}", item.getItemType());
 
-        Item saved = repository.save(item);
+        Item saved = itemService.save(item);
         redirectAttributes.addAttribute("itemId", saved.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/form/items/{itemId}";
@@ -110,14 +106,14 @@ public class FormItemController {
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
-        model.addAttribute("item", finded);
+        Optional<Item> finded = itemService.findById(itemId);
+        model.addAttribute("item", finded.get());
         return "form/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
-    public String doEdit(@PathVariable Long itemId, Item item) {
-        repository.update(itemId, item);
+    public String doEdit(@PathVariable Long itemId, ItemUpdateDto item) {
+        itemService.update(itemId, item);
         return "redirect:/form/items/{itemId}";
     }
 }
