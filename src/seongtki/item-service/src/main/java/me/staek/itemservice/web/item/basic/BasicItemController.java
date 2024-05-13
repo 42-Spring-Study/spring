@@ -1,15 +1,17 @@
 package me.staek.itemservice.web.item.basic;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import me.staek.itemservice.domain.item.Item;
 import me.staek.itemservice.domain.item.ItemRepository;
+import me.staek.itemservice.domain.item.MemoryItemRepository;
+import me.staek.itemservice.web.validation.dto.ItemUpdateDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/basic/items")
@@ -27,7 +29,7 @@ public class BasicItemController {
 
     @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
+        Optional<Item> finded = repository.findById(itemId);
         model.addAttribute("item", finded);
         return "basic/item";
     }
@@ -94,13 +96,13 @@ public class BasicItemController {
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
+        Optional<Item> finded = repository.findById(itemId);
         model.addAttribute("item", finded);
         return "basic/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
-    public String doEdit(@PathVariable Long itemId, Item item) {
+    public String doEdit(@PathVariable Long itemId, ItemUpdateDto item) {
         repository.update(itemId, item);
         return "redirect:/basic/items/{itemId}";
     }

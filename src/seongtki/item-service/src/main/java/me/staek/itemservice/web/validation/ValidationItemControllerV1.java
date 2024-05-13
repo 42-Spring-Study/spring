@@ -2,10 +2,8 @@ package me.staek.itemservice.web.validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.staek.itemservice.domain.item.DeliveryCode;
-import me.staek.itemservice.domain.item.Item;
-import me.staek.itemservice.domain.item.ItemRepository;
-import me.staek.itemservice.domain.item.ItemType;
+import me.staek.itemservice.domain.item.*;
+import me.staek.itemservice.web.validation.dto.ItemUpdateDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -63,8 +61,8 @@ public class ValidationItemControllerV1 {
 
     @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
-        model.addAttribute("item", finded);
+        Optional<Item> finded = repository.findById(itemId);
+        model.addAttribute("item", finded.get());
         return "validation/v1/item";
     }
 
@@ -120,13 +118,13 @@ public class ValidationItemControllerV1 {
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
-        model.addAttribute("item", finded);
+        Optional<Item> finded = repository.findById(itemId);
+        model.addAttribute("item", finded.get());
         return "validation/v1/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
-    public String doEdit(@PathVariable Long itemId, Item item) {
+    public String doEdit(@PathVariable Long itemId, ItemUpdateDto item) {
         repository.update(itemId, item);
         return "redirect:/validation/v1/items/{itemId}";
     }

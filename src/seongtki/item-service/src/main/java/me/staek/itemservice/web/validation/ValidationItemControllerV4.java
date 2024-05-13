@@ -12,10 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -66,8 +63,8 @@ public class ValidationItemControllerV4 {
 
     @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
-        model.addAttribute("item", finded);
+        Optional<Item> finded = repository.findById(itemId);
+        model.addAttribute("item", finded.get());
         return "validation/v4/item";
     }
 
@@ -104,7 +101,7 @@ public class ValidationItemControllerV4 {
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
+        Item finded = repository.findById(itemId).get();
         model.addAttribute("item", finded);
         return "validation/v4/editForm";
     }
@@ -125,8 +122,8 @@ public class ValidationItemControllerV4 {
             return "validation/v4/editForm";
         }
 
-        Item item = new Item(itemDto.getItemName(), itemDto.getPrice(), itemDto.getQuantity());
-        repository.update(itemId, item);
+//        ItemUpdateDto item = new ItemUpdateDto(itemDto.getItemName(), itemDto.getPrice(), itemDto.getQuantity());
+        repository.update(itemId, itemDto);
         return "redirect:/validation/v4/items/{itemId}";
     }
 }

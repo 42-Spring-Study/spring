@@ -3,21 +3,15 @@ package me.staek.itemservice.web.validation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.staek.itemservice.domain.item.*;
+import me.staek.itemservice.web.validation.dto.ItemUpdateDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -68,8 +62,8 @@ public class ValidationItemControllerV3 {
 
     @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
-        model.addAttribute("item", finded);
+        Optional<Item> finded = repository.findById(itemId);
+        model.addAttribute("item", finded.get());
         return "validation/v3/item";
     }
 
@@ -163,13 +157,13 @@ public class ValidationItemControllerV3 {
 
     @GetMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, Model model) {
-        Item finded = repository.findByItem(itemId);
-        model.addAttribute("item", finded);
+        Optional<Item> finded = repository.findById(itemId);
+        model.addAttribute("item", finded.get());
         return "validation/v3/editForm";
     }
 
 //    @PostMapping("/{itemId}/edit")
-    public String doEdit(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult br) {
+    public String doEdit(@PathVariable Long itemId, @Validated @ModelAttribute ItemUpdateDto item, BindingResult br) {
 
         // 복합 필드 검증
         if (item.getPrice() != null && item.getQuantity() != null) {
@@ -190,7 +184,7 @@ public class ValidationItemControllerV3 {
     }
 
     @PostMapping("/{itemId}/edit")
-    public String doEdit2(@PathVariable Long itemId, @Validated(UpdateCheck.class)  @ModelAttribute Item item, BindingResult br) {
+    public String doEdit2(@PathVariable Long itemId, @Validated(UpdateCheck.class)  @ModelAttribute ItemUpdateDto item, BindingResult br) {
 
         // 복합 필드 검증
         if (item.getPrice() != null && item.getQuantity() != null) {

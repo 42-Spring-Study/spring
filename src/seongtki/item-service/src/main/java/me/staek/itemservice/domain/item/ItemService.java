@@ -6,10 +6,9 @@ import me.staek.itemservice.web.validation.dto.ItemUpdateDto;
 import java.util.List;
 import java.util.Optional;
 
-public interface ItemRepository {
+public interface ItemService {
     Item save(Item item);
+    void update(Long itemId, ItemUpdateDto updateParam);
     Optional<Item> findById(Long id);
-    List<Item> findAll();
-    List<Item> findAll(ItemSearchCond cond);
-    void update(Long id, ItemUpdateDto uptItem);
+    List<Item> findItems(ItemSearchCond itemSearch);
 }
