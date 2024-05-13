@@ -1,10 +1,17 @@
 package me.staek;
 
+import me.staek.itemservice.config.MemberConfig;
+import me.staek.itemservice.config.MemoryConfig;
+import me.staek.itemservice.data.ItemInitData;
+import me.staek.itemservice.domain.item.ItemRepository;
+import me.staek.itemservice.domain.member.MemberRepository;
 import me.staek.itemservice.web.validation.ItemValidator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.Validator;
 import org.springframework.web.servlet.LocaleResolver;
@@ -13,7 +20,12 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 
-@SpringBootApplication
+/**
+ * web과 선택한 파일만 scan 대상으로 설정
+ */
+@Import({MemoryConfig.class, MemberConfig.class})
+@SpringBootApplication(scanBasePackages = "me.staek.itemservice.web")
+//@SpringBootApplication
 public class ItemServiceApplication {
 
     /**
@@ -31,6 +43,15 @@ public class ItemServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ItemServiceApplication.class, args);
+    }
+
+    /**
+     * test 데이터는 local 세팅에서만 실행되도록 설정
+     */
+    @Bean
+    @Profile("local")
+    public ItemInitData testDataInit(ItemRepository itemRepository, MemberRepository memberRepository) {
+        return new ItemInitData(itemRepository, memberRepository);
     }
 
 }
