@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.staek.itemservice.config.*;
 import me.staek.itemservice.data.ItemInitData;
 import me.staek.itemservice.domain.item.ItemRepository;
+import me.staek.itemservice.domain.item.jpa.SpringDataJpaItemRepository;
 import me.staek.itemservice.domain.member.MemberRepository;
 import me.staek.itemservice.web.validation.ItemValidator;
 import org.springframework.boot.SpringApplication;
@@ -27,7 +28,11 @@ import java.util.Locale;
  */
 
 @Slf4j
-@Import({JdbcTemplateV3Config.class, MemberConfig.class})
+@Import({QuerydslConfig.class, MemberConfig.class})
+//@Import({SpringDataJpaConfig.class, MemberConfig.class})
+//@Import({JpaConfig.class, MemberConfig.class})
+//@Import({MyBatisConfig.class, MemberConfig.class})
+//@Import({JdbcTemplateV3Config.class, MemberConfig.class})
 //@Import({JdbcTemplateV2Config.class, MemberConfig.class})
 //@Import({JdbcTemplateV1Config.class, MemberConfig.class})
 //@Import({MemoryConfig.class, MemberConfig.class})
