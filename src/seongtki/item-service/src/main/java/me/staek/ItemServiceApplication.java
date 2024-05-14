@@ -27,7 +27,8 @@ import java.util.Locale;
  */
 
 @Slf4j
-@Import({JdbcTemplateV3Config.class, MemberConfig.class})
+@Import({MyBatisConfig.class, MemberConfig.class})
+//@Import({JdbcTemplateV3Config.class, MemberConfig.class})
 //@Import({JdbcTemplateV2Config.class, MemberConfig.class})
 //@Import({JdbcTemplateV1Config.class, MemberConfig.class})
 //@Import({MemoryConfig.class, MemberConfig.class})
