@@ -1,7 +1,6 @@
 package me.staek;
 
-import me.staek.itemservice.config.MemberConfig;
-import me.staek.itemservice.config.MemoryConfig;
+import me.staek.itemservice.config.*;
 import me.staek.itemservice.data.ItemInitData;
 import me.staek.itemservice.domain.item.ItemRepository;
 import me.staek.itemservice.domain.member.MemberRepository;
@@ -23,7 +22,10 @@ import java.util.Locale;
 /**
  * web과 선택한 파일만 scan 대상으로 설정
  */
-@Import({MemoryConfig.class, MemberConfig.class})
+@Import({JdbcTemplateV3Config.class, MemberConfig.class})
+//@Import({JdbcTemplateV2Config.class, MemberConfig.class})
+//@Import({JdbcTemplateV1Config.class, MemberConfig.class})
+//@Import({MemoryConfig.class, MemberConfig.class})
 @SpringBootApplication(scanBasePackages = "me.staek.itemservice.web")
 //@SpringBootApplication
 public class ItemServiceApplication {
