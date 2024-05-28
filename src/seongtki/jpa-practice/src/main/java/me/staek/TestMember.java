@@ -2,7 +2,6 @@ package me.staek;
 
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,18 +10,18 @@ import java.util.Date;
 /**
  */
 @Entity
-@Table(name = "Member", uniqueConstraints = {@UniqueConstraint( name = "UNIQUE_MEMBER_NAME",
+@Table(name = "Test_Member", uniqueConstraints = {@UniqueConstraint( name = "UNIQUE_TEST_MEMBER_NAME",
                                                 columnNames = {"NAME"} )})
 @SequenceGenerator(
-        name = "SEQ_MEMBER_GEN",
-        sequenceName = "SEQ_MEMBER",
+        name = "SEQ_TEST_MEMBER_GEN",
+        sequenceName = "SEQ_TEST_MEMBER",
         initialValue = 1, allocationSize = 50
 )
 //@TableGenerator(
-//        name = "MEMBER_SEQ_GEN",
-//        table = "SEQ_MEMBER",
-//        pkColumnValue = "SEQ_MEMBER", allocationSize = 50)
-public class Member {
+//        name = "TEST_MEMBER_SEQ_GEN",
+//        table = "SEQ_TEST_MEMBER",
+//        pkColumnValue = "SEQ_TEST_MEMBER", allocationSize = 50)
+public class TestMember {
 
     /**
      * GenerationType.IDENTITY
@@ -38,8 +37,8 @@ public class Member {
      * - sequcene 하고 비슷한데 테이블을 로 값을 관리한다.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_MEMBER_GEN")
-    @Column(name = "MEMBER_ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_TEST_MEMBER_GEN")
+    @Column(name = "TEST_MEMBER_ID")
     private Long id;
 
 
@@ -81,9 +80,9 @@ public class Member {
     @Transient
     private String temp;
 
-    public Member() {}
+    public TestMember() {}
 
-    public Member(String name) {
+    public TestMember(String name) {
         this.name = name;
     }
 

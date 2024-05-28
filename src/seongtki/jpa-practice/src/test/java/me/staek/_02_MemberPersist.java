@@ -3,8 +3,6 @@ package me.staek;
 
 import jakarta.persistence.*;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ThrowableAssert;
-import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -26,11 +24,11 @@ public class _02_MemberPersist {
         try {
             tx.begin();
 
-            Member member = new Member("member");
-            em.persist(member);
+            TestMember testMember = new TestMember("member");
+            em.persist(testMember);
             em.flush();
-            Long id = member.getId();
-            Member finded = em.find(Member.class, id);
+            Long id = testMember.getId();
+            TestMember finded = em.find(TestMember.class, id);
             Assertions.assertThat(finded.getName()).isEqualTo("member");
             tx.commit();
         } catch (PersistenceException e) {
@@ -56,16 +54,16 @@ public class _02_MemberPersist {
         try {
             tx.begin();
 
-            Member member = new Member("member_detach");
-            em.persist(member);
+            TestMember testMember = new TestMember("member_detach");
+            em.persist(testMember);
             em.flush();
 
-            member.setName("update_member");
-            Long id = member.getId();
-            em.detach(member);
+            testMember.setName("update_member");
+            Long id = testMember.getId();
+            em.detach(testMember);
             em.flush();
 
-            Member finded = em.find(Member.class, id);
+            TestMember finded = em.find(TestMember.class, id);
             System.out.println(finded.getName());
             Assertions.assertThat(finded.getName()).isNotEqualTo("update_member");
             tx.commit();
@@ -90,14 +88,14 @@ public class _02_MemberPersist {
         try {
             tx.begin();
 
-            Member member = new Member("member");
-            em.persist(member);
+            TestMember testMember = new TestMember("member");
+            em.persist(testMember);
             em.flush();
 
-            Long id = member.getId();
+            Long id = testMember.getId();
 
-            Member finded1 = em.find(Member.class, id);
-            Member finded2 = em.find(Member.class, id);
+            TestMember finded1 = em.find(TestMember.class, id);
+            TestMember finded2 = em.find(TestMember.class, id);
             Assertions.assertThat(finded1).isEqualTo(finded2);
             tx.commit();
         } catch (PersistenceException e) {
@@ -122,17 +120,17 @@ public class _02_MemberPersist {
         try {
             tx.begin();
 
-            Member member = new Member("member");
-            Member member2 = new Member("member");
-            Member member3 = new Member("member");
-            em.persist(member);
-            em.persist(member2);
-            em.persist(member3);
+            TestMember testMember = new TestMember("member");
+            TestMember testMember2 = new TestMember("member");
+            TestMember testMember3 = new TestMember("member");
+            em.persist(testMember);
+            em.persist(testMember2);
+            em.persist(testMember3);
             em.clear();
 //            em.close();
             em.flush();
 
-            List<Member> list = em.createQuery("select m from Member as m ", Member.class).getResultList();
+            List<TestMember> list = em.createQuery("select m from TestMember as m ", TestMember.class).getResultList();
             System.out.println(list.size());
 
             Assertions.assertThat(list.size()).isZero();
@@ -163,12 +161,12 @@ public class _02_MemberPersist {
             tx.begin();
 
             for ( int i = 0; i < 10000; i++ ) {
-                Member member = new Member("test" + i);
-                em.persist( member );
+                TestMember testMember = new TestMember("test" + i);
+                em.persist(testMember);
             }
 
             tx.commit();
-            List list = em.createQuery("select m from Member m").getResultList();
+            List list = em.createQuery("select m from TestMember m").getResultList();
             Assertions.assertThat(10000).isEqualTo(list.size());
         } catch (RuntimeException e) {
             if ( tx != null && tx.isActive()) tx.rollback();

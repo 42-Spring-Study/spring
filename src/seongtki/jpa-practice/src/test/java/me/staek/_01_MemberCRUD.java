@@ -18,10 +18,10 @@ public class _01_MemberCRUD {
         try {
             tx.begin();
 
-            Member member = new Member();
-            member.setName("name");
+            TestMember testMember = new TestMember();
+            testMember.setName("name");
 
-            em.persist(member);
+            em.persist(testMember);
             tx.commit();
         } catch (PersistenceException e) {
             e.printStackTrace();
@@ -44,12 +44,12 @@ public class _01_MemberCRUD {
         try {
             tx.begin();
 
-            Member member = new Member();
+            TestMember testMember = new TestMember();
 
             Assertions.assertThatThrownBy(new ThrowableAssert.ThrowingCallable() {
                 @Override
                 public void call() throws Throwable {
-                    em.persist(member);
+                    em.persist(testMember);
                 }
             }).isInstanceOf(PropertyValueException.class);
             tx.commit();
@@ -72,21 +72,21 @@ public class _01_MemberCRUD {
         try {
             tx.begin();
 
-            Member member = new Member();
-            member.setName("name");
-            em.persist(member);
+            TestMember testMember = new TestMember();
+            testMember.setName("name");
+            em.persist(testMember);
 
             em.flush();
 
             /**
              * 1차캐시에 저장된 상태에서 (Detach 아닌 엔티티정보) 변경한다.
              */
-            member.setName("new name");
+            testMember.setName("new name");
             /**
              * 지연쿼리 요청
              */
             em.flush();
-            Long id = member.getId();
+            Long id = testMember.getId();
             /**
              * 1차캐시 삭제
              */
@@ -94,7 +94,7 @@ public class _01_MemberCRUD {
             /**
              * DB로부터 id에대한 정보 조회
              */
-            Member finded = em.find(Member.class, id);
+            TestMember finded = em.find(TestMember.class, id);
             Assertions.assertThat(finded.getName()).isEqualTo("new name");
             tx.commit();
         } catch (PersistenceException e) {
@@ -114,17 +114,17 @@ public class _01_MemberCRUD {
         try {
             tx.begin();
 
-            Member member = new Member();
-            member.setName("name");
-            em.persist(member);
+            TestMember testMember = new TestMember();
+            testMember.setName("name");
+            em.persist(testMember);
 
             em.flush();
 
             /**
              * 1차캐시에 저장된 상태에서 (Detach 아닌 엔티티정보) 변경한다.
              */
-            Long id = member.getId();
-            em.remove(member);
+            Long id = testMember.getId();
+            em.remove(testMember);
             /**
              * 지연쿼리 요청
              */
@@ -136,7 +136,7 @@ public class _01_MemberCRUD {
             /**
              * DB로부터 id에대한 정보 조회
              */
-            Member finded = em.find(Member.class, id);
+            TestMember finded = em.find(TestMember.class, id);
             Assertions.assertThat(finded).isNull();
             tx.commit();
         } catch (PersistenceException e) {
