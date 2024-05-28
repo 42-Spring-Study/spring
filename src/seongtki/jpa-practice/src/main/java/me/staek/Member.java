@@ -14,6 +14,12 @@ public class Member {
     private String name;
     private Long age;
 
+    public Member() {}
+
+    public Member(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
