@@ -168,6 +168,8 @@ public class _02_MemberPersist {
             }
 
             tx.commit();
+            List list = em.createQuery("select m from Member m").getResultList();
+            Assertions.assertThat(10000).isEqualTo(list.size());
         } catch (RuntimeException e) {
             if ( tx != null && tx.isActive()) tx.rollback();
             throw e;
