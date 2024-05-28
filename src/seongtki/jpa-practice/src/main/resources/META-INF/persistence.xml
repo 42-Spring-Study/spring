@@ -22,6 +22,9 @@
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
+            <!-- batch size-->
+            <property name="hibernate.jdbc.batch_size" value="100"/>
+
 
             <!--
             create : SessionFactory 시작시 스키마를 삭제하고 다시 생성
@@ -31,7 +34,7 @@
             validate : SessionFactory 시작시 객체구성과 스키마가 다르다면 예외 발생시킴 - 테이블컬럼 O, 엔티티컬럼 X : 정상,
                                                                               테이블컬럼 X, 엔티티컬럼 O : SchemaManagementException
             -->
-            <property name="hibernate.hbm2ddl.auto" value="none" />
+            <property name="hibernate.hbm2ddl.auto" value="create" />
         </properties>
     </persistence-unit>
 </persistence>
