@@ -163,7 +163,7 @@ public class _02_MemberPersist {
             tx.begin();
 
             for ( int i = 0; i < 10000; i++ ) {
-                Member member = new Member("test");
+                Member member = new Member("test" + i);
                 em.persist( member );
             }
 
