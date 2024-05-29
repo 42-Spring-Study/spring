@@ -7,7 +7,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "PRODUCT_MEMBER")
-public class ProductMember {
+public class ProductMember extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "PRODUCT_MEMBER_ID")

@@ -3,7 +3,7 @@ package me.staek.shop.domain;
 import jakarta.persistence.*;
 
 @Entity
-public class Delivery {
+public class Delivery extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "DELIVERY_ID")
