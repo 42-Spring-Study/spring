@@ -50,6 +50,29 @@ public class Member {
     @JoinColumn(name = "LOCKER_ID")
     private Locker locker;
 
+
+    /**
+     * N:M 설정
+     * 양방향 참조객체 설정
+     */
+//    @ManyToMany(mappedBy = "members")
+//    private List<Product> products = new ArrayList<>();
+
+//    public List<Product> getProducts() {
+//        return products;
+//    }
+
+    /**
+     * 1쪽 참조객체
+     * - N:M 매핑테이블의 member를 참조
+     */
+    @OneToMany(mappedBy = "member")
+    private List<ProductMember> productMembers = new ArrayList<>();
+
+    public List<ProductMember> getProductMembers() {
+        return productMembers;
+    }
+
     public Locker getLocker() {
         return locker;
     }
