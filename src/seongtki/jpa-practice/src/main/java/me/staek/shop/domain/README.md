@@ -164,3 +164,26 @@ private List<ProductMember> productMembers = new ArrayList<>();
 private List<ProductMember> productMembers = new ArrayList<>();
 
 ~~~
+
+
+### 상속관계
+~~~
+
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE) 
+- 기본전략이다.
+- @DiscriminatorColumn로 구분자를 통해 하위 계층을 구분하여 사용할 수 있다.
+- 테이블이 하나이기 때문에 성능이 기본적으로 좋지만 관리를 잘 해야함.
+
+@Inheritance(strategy = InheritanceType.JOINED)
+- DB의 상속관계를 만들어 생성한다.
+- 구조화가 잘 되어 있지만 기본적으로 복잡하다.
+- 주요하고 데이터가 매우 많은 테이블이라면 트레이드오프 해서 사용하자.
+
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+- 부모 키를 가지고 각각 테이블이 생성된다. 서로 관계가 없어서 데이터를 상위객체 (Item)으로 조회 시 union 조회하여 성능에 좋지 않다.
+- 쓸 이유가 딱히 없다/
+
+@DiscriminatorColumn
+- 기본 객체명 : DTYPE 으로 입력된다
+- 하위계층 구분자라고 보면된다.
+~~~
