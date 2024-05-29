@@ -187,3 +187,26 @@ private List<ProductMember> productMembers = new ArrayList<>();
 - 기본 객체명 : DTYPE 으로 입력된다
 - 하위계층 구분자라고 보면된다.
 ~~~
+
+### @MappedSuperclass
+
+~~~
+기본 컬럼을 구성할 수 있따.
+
+-- 아래처럼 생성할 수 있다.
+-- 해당 클래스는 테이블매핑되지 않음.
+@MappedSuperclass
+public abstract class BaseEntity {
+    private String createdBy;
+    private LocalDateTime careteDTM;
+}
+    
+-- 아래처럼 테이블에서 상속받아 사용할 수 있다.
+-- 테이블 생성시 자동으로 기본 컬럼이 생성됨. 
+@Entity
+public class Order extends BaseEntity {
+}
+
+
+-- 다소 불편해보이지만 Spring JPA에서 자동으로 값을 세팅할 수 있다고 한다.
+~~~
