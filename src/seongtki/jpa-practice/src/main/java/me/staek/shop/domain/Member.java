@@ -21,8 +21,17 @@ public class Member {
     /**
      * M쪽 연관관계주인 매핑
      */
+//    @ManyToOne
+//    @JoinColumn(name = "TEAM_ID")
+//    private Team team;
+
+
+    /**
+     * M쪽 연관관계 매핑
+     * - insert, update 를 모두 False 해주어야 갱신,추가 권한이 없어져 문제가 없다.
+     */
     @ManyToOne
-    @JoinColumn(name = "TEAM_ID")
+    @JoinColumn(name = "TEAM_ID", insertable = false, updatable = false)
     private Team team;
 
     /**
