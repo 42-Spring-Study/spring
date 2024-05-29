@@ -117,3 +117,50 @@ private Member member;
 
 
 ~~~
+
+
+### N:M
+
+~~~
+N대M 테이블이라는건 존재할 수 없다.
+양쪽 테이블 모두 상대 테이블 key를 추가해야 조건을 만족하기 때문에, 결국 같은 key의 다른 일반컬럼을가진 두개 테이블이 된다.
+
+이를 해결하기 위해 N:M 매핑 태이블을 만든다.
+매핑 테이블은 양쪽 테이블과 1:M 관계를 유지하고, 양쪽 테이블 key에 대해 왜래키이자 기본키인 식별관계를 설정하게 된다.
+
+Member (N) : Product (M) 관계에서 아래처럼 참조객체 매핑을 할 수 있는데(양방향), 
+PRODUCT_MEMBER 이름의 매핑테이블이 식별관계로 생성된다.
+
+<Product, 참조객체 매핑>
+@ManyToMany
+@JoinTable(name = "PRODUCT_MEMBER")
+private List<Member> members = new ArrayList<>();
+
+<Member, Product에 일기전용 매핑>
+@ManyToMany(mappedBy = "members")
+private List<Product> products = new ArrayList<>();
+
+
+다만, 현업에서는 매핑테이블에 추가 컬럼사용을 많이 하기 때문에 해당기능은 사용하지 않는다.
+추가적으로 매핑테이블의 식별관계 역시 비지니스 로직에 유연하지 못한 경우가 많아 비식별관계로 작성해 사용한다. 
+
+매핑테이블을 따로 생성할 시 아래와 같이 양방향 설정할 수 있다.
+
+<PRODUCT_MEMBER - 단방향 참조객체 매핑>
+@ManyToOne
+@JoinColumn(name = "PRODUCT_ID")
+private Product product;
+
+@ManyToOne
+@JoinColumn(name = "MEMBER_ID")
+private Member member;
+
+<MEMBER - 양방향 참조객체>
+@OneToMany(mappedBy = "member")
+private List<ProductMember> productMembers = new ArrayList<>();
+
+<PRODUCT - 양방향 참조객체>
+@OneToMany(mappedBy = "product")
+private List<ProductMember> productMembers = new ArrayList<>();
+
+~~~
