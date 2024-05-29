@@ -16,14 +16,14 @@ public class ProductMember extends BaseEntity {
     /**
      * M쪽 참조객체 매핑
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
     /**
      * M쪽 참조객체 매핑
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 

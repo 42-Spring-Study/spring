@@ -17,15 +17,15 @@ public class Team {
     /**
      * 1쪽 연관관계 매핑
      */
-//    @OneToMany(mappedBy = "team")
-//    private List<Member> members = new ArrayList<>();
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Member> members = new ArrayList<>();
 
     /**
      * 1쪽 연관관계주인 매핑
      */
-    @OneToMany
-    @JoinColumn(name = "TEAM_ID")
-    private List<Member> members = new ArrayList<>();
+//    @OneToMany
+//    @JoinColumn(name = "TEAM_ID")
+//    private List<Member> members = new ArrayList<>();
 
 
     public List<Member> getMembers() {

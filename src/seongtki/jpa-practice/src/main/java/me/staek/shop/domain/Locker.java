@@ -15,7 +15,7 @@ public class Locker extends BaseEntity {
      * 주테이블 Member (1) : 타겟테이블 Locker (1)
      * - 주 테이블의 locker를 참조하는 읽기전용 참조객체
      */
-    @OneToOne(mappedBy = "locker")
+    @OneToOne(mappedBy = "locker", fetch = FetchType.LAZY)
     private Member member;
 
     public Member getMember() {

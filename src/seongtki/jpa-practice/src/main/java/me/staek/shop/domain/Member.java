@@ -21,18 +21,18 @@ public class Member extends BaseEntity {
     /**
      * M쪽 연관관계주인 매핑
      */
-//    @ManyToOne
-//    @JoinColumn(name = "TEAM_ID")
-//    private Team team;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
 
 
     /**
      * M쪽 연관관계 매핑
      * - insert, update 를 모두 False 해주어야 갱신,추가 권한이 없어져 문제가 없다.
      */
-    @ManyToOne
-    @JoinColumn(name = "TEAM_ID", insertable = false, updatable = false)
-    private Team team;
+//    @ManyToOne
+//    @JoinColumn(name = "TEAM_ID", insertable = false, updatable = false)
+//    private Team team;
 
     /**
      * 1쪽 연관관계 매핑
@@ -46,7 +46,7 @@ public class Member extends BaseEntity {
      * - 주 테이블에 연관관계 매핑
      * - Member 테이블에 외래키 생성.
      */
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "LOCKER_ID")
     private Locker locker;
 
