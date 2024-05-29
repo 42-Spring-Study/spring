@@ -210,3 +210,46 @@ public class Order extends BaseEntity {
 
 -- 다소 불편해보이지만 Spring JPA에서 자동으로 값을 세팅할 수 있다고 한다.
 ~~~
+
+
+### 프록시 기능 & 즉시로딩 지연로딩
+~~~
+<Reference>
+1. getRefrecece로 호출 시 지연로딩되고 프록시가 리턴된다.
+- 프록시는 타겟을 상속해서 만든 객체이고, 이미 존재하는 정보는 유지됨 (상속했으니까)
+- 실제 객체를 사용했을 때 프록시에 타겟정보가 없으면, DB를 통해 영속성에 추가하고 타겟으로 위임해서 정보를 가져감.
+2. find() 로 같은 정보를 조회할 때, 동등성을 유지해준다.
+- find() 이후 getReference() 순서로 조회하던 반대로 하던 getClass() 정보는 같다.
+3. getReference() 로 프록시 객체가 사용될 수 있으니 객체 타입 검증은 instanceof 로 하자.
+- 프록시객체 instanceof Member, Member객체 instanceof Member
+
+<즉시, 지연로딩>
+1. ManyToOne, OneToOne => 기본이 즉시로딩 => 지연로딩 설정필요
+2. OneToMany, ManyToMany -> 기본이 지연로딩
+3. 즉시로딩 설정 시, find()호출하면 모든 연관객체를 join형태로 호출하고, JPQL 사용 시 N+1 회 쿼리가 발생한다.
+4. 지연로딩 설정 시, find() 혹은 JPQL 사용 시 연관객체 접근할 때 해당 쿼리가 발생
+- 지연로딩 시 연관객체 사용시점에 쿼리후 리턴된 객체를 확인해보면 프록시로 되어있고, 동등성도 유지된다.
+5. JPQL fetch join, 엔티티 그래프, batch size 로 N+1 문제 해결 가능. 뒤에 두 가지는 나중에 소개한다고 한다.
+
+~~~
+
+### cascade
+
+~~~
+부모자식이 설정된 상황 (외래키가 있는 쪽이 자식이다) 에서 cascade 사용
+
+-- 1쪽에 의해 M쪽이 삭제되었을 때 아래 옵션이 존재하면 M쪽만 삭제가 가능하다.
+@ManyToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+
+team3.getMembers().remove(0); // 1쪽에서 M쪽 객체를찾아서 remove
+
+
+-- 1쪽이 삭제되었을 때 M쪽이 모든 부모를 잃게 된다.
+-- 기본적으로 부모가 먼저삭제될 수 없고
+-- 1쪽에  orphanRemoval = true 혹은 cascade = CascadeType.REMOVE 가 설정되어 있을 때 1쪽과 함께 M쪽이 모두 삭제된다.
+@ManyToOne(cascade = CascadeType.REMOVE) 혹은 @ManyToOne(orphanRemoval = true)
+
+em.remove(team3);
+            
+            
+~~~
