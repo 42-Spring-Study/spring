@@ -40,6 +40,24 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
+
+    /**
+     * 주테이블 Member (1) : 타겟테이블 Locker (1)
+     * - 주 테이블에 연관관계 매핑
+     * - Member 테이블에 외래키 생성.
+     */
+    @OneToOne
+    @JoinColumn(name = "LOCKER_ID")
+    private Locker locker;
+
+    public Locker getLocker() {
+        return locker;
+    }
+
+    public void setLocker(Locker locker) {
+        this.locker = locker;
+    }
+
     public Long getId() {
         return id;
     }
