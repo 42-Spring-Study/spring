@@ -3,7 +3,9 @@ package me.staek.shop.domain;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Member extends BaseEntity {
@@ -13,9 +15,63 @@ public class Member extends BaseEntity {
     @Column(name = "MEMBER_ID")
     private Long id;
     private String name;
-    private String city;
-    private String zipcode;
-    private String street;
+
+    @Embedded
+    private Address address;
+
+
+    /**
+     * ElementCollection : 지연로딩
+     *
+     */
+    @ElementCollection
+    @CollectionTable(name = "FAVOLITE_FOODS", joinColumns = @JoinColumn(name = "MEMBER_ID"))
+    @Column(name="FOOD_NAME")
+    private Set<String> favoliteFoods = new HashSet<>();
+
+    /**
+     * Collection Value Type
+     * - 식별자가 필요하거나 변경이 필요하여 Entity 생명주기에 종속적이지 않게 되는경우 사용하지 않는 게 좋다.
+     */
+//    @ElementCollection
+//    @CollectionTable(name = "ADDRESS")
+//    private List<Address> addressHistory = new ArrayList<>();
+//    public List<Address> getAddressHistory() {
+//        return addressHistory;
+//    }
+
+    /**
+     * Collection Value Type 를 Entity로 추출하여 아래처럼 작성할 수 있다.
+     */
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "MEMBER_ID")
+    private List<EntityAddress> addressHistory = new ArrayList<>();
+
+    public List<EntityAddress> getAddressHistory() {
+        return addressHistory;
+    }
+
+    public Set<String> getFavoliteFoods() {
+        return favoliteFoods;
+    }
+
+
+    /**
+     * 값 객체의 변수 이름을 실제 테이블 컬럼으로 변경세팅할 수 있다.
+     */
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city", column = @Column(name = "WORK_CITY")),
+            @AttributeOverride(name = "zipcode", column = @Column(name = "WORK_ZIPCODE")),
+            @AttributeOverride(name = "street", column = @Column(name = "WORK_STREET"))
+    })
+    private Address workAddress;
+
+    /**
+     * Embedded Type 객체변수 정의
+     */
+    @Embedded
+    private Period period;
 
 
     /**
@@ -24,6 +80,22 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEAM_ID")
     private Team team;
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public Period getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(Period period) {
+        this.period = period;
+    }
 
 
     /**
@@ -101,28 +173,5 @@ public class Member extends BaseEntity {
         this.name = name;
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getZipcode() {
-        return zipcode;
-    }
-
-    public void setZipcode(String zipcode) {
-        this.zipcode = zipcode;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
 
 }
