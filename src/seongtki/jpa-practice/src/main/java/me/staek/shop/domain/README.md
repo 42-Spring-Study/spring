@@ -253,3 +253,59 @@ em.remove(team3);
             
             
 ~~~
+
+
+### 값 타입
+
+~~~
+
+분류
+1. 기본 값 타입
+- primive type
+- Rapper type
+- String
+
+2. Embedded Type
+
+3. Collection Value Type
+
+
+### Embedded Type
+
+생명주기를 Entity 에 의존
+가변은 안됨. 
+비지니스로직 작성 용이
+기본생성자 필수
+
+value class 를 jpa에서 Embedded class 라 하고 태그를 부착함
+- @Embeddable: 클래스 정의하는 곳에 부착
+- @Embedded: 클래스 변수 정의하는 곳에 부착
+
+Embedded Type의 속성을 같은 Entity에서 사용하여 컬럼 명이 중복될 경우
+- @AttributeOverrides, @AttributeOverride를 객체변수 정의 부분에 부착하여 컬럼명을 커스텀할 수 잇다.
+-   @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city", column = @Column(name = "WORK_CITY")),
+            @AttributeOverride(name = "zipcode", column = @Column(name = "WORK_ZIPCODE")),
+            @AttributeOverride(name = "street", column = @Column(name = "WORK_STREET"))
+    })
+    private Address workAddress;
+
+
+### Collection Value Type
+- 값 객체를 여러 묶음 저장해야 할 경우 별도의 테이블이 필요하다.
+
+객체변수 선언부에 @ElementCollection, @CollectionTable 작성하여 사용
+-   @ElementCollection
+    @CollectionTable(name = "FAVOLITE_FOODS", joinColumns = @JoinColumn(name = "MEMBER_ID"))
+    @Column(name="FOOD_NAME")
+    private Set<String> favoliteFoods = new HashSet<>();
+- 기본적으로 지연로딩 이다.
+- 테이블이 생성되고, 왜래키 까지는 저장되지만, Row를 구별할 수 있는 식별자가 존재하지 않는다. (식별자를 따로 만드려면 모든 컬럼에 대한 복합키로 만들어야 함)
+- 특정 값을 변경하려 할때, 컬렉션 1개를 삭제후 추가하게 되는데, 이 때 왜래키에 대한 모든 Row가 삭제되었다가 다시 Insert되는 불합리가 보인다.
+  (Cascade.All, 고아객체 제거 기능이 기본임)
+- 이처럼 값이 변경되는, Entity와 별개로 관리되어야 하는 데이터의 경우에는 Entity를 따로 만드는 것이 더 낫다.
+- select box 와 같이 정말 간단하고 Entity에 종속적인 경우에만 사용하는 게 좋다.
+
+
+~~~
