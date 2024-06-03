@@ -13,8 +13,12 @@ public class Delivery extends BaseEntity {
     @OneToOne(mappedBy = "delivery", fetch = FetchType.LAZY)
     private Order order;
 
-    private String zipcode;
-    private String street;
-    private String city;
+    @Embedded
+    private Address address;
+
+    public Address getAddress() {
+        return address;
+    }
+
     private DeliveryStatus deliveryStatus;
 }
