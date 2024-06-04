@@ -16,9 +16,22 @@ public class Delivery extends BaseEntity {
     @Embedded
     private Address address;
 
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
     public Address getAddress() {
         return address;
     }
 
+    @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 }

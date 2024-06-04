@@ -25,7 +25,7 @@ public class Order extends BaseEntity {
     private Member member;
 
     /**
-     * 1쪽 연관관계ㄴ 매핑
+     * 1쪽 연관관계 매핑
      */
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -63,11 +63,12 @@ public class Order extends BaseEntity {
         this.orderStatus = orderStatus;
     }
 
-    /**
-     * 연관관계 편의 메서드
-     */
-    public void addOrderItem(OrderItem orderItem) {
-        orderItems.add(orderItem);
-        orderItem.setOrder(this);
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+
+    public void addDelivery(Delivery delivery) {
+        this.delivery = delivery;
     }
 }

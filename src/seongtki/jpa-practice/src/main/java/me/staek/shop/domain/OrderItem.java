@@ -57,4 +57,13 @@ public class OrderItem extends BaseEntity {
     public void setCount(int count) {
         this.count = count;
     }
+
+    /**
+     * 연관관계 편의 메서드
+     */
+    public void addOrderItem(Order order, Item item) {
+        order.getOrderItems().add(this);
+        this.order = order;
+        this.item = item;
+    }
 }

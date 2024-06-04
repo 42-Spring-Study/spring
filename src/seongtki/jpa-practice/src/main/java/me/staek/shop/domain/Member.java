@@ -14,6 +14,8 @@ public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "MEMBER_ID")
     private Long id;
+
+    @Column(unique = true)
     private String name;
 
     @Embedded
