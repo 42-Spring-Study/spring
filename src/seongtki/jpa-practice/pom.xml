@@ -45,6 +45,13 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-community-dialects -->
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-community-dialects</artifactId>
+      <version>6.4.4.Final</version>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc8 -->
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
