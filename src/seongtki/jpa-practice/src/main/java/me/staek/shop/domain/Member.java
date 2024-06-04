@@ -2,10 +2,7 @@ package me.staek.shop.domain;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Member extends BaseEntity {
@@ -57,6 +54,35 @@ public class Member extends BaseEntity {
         return favoliteFoods;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Member member = (Member) object;
+        return Objects.equals(getId(), member.getId()) && Objects.equals(getName(), member.getName()) && Objects.equals(getAddress(), member.getAddress()) && Objects.equals(getFavoliteFoods(), member.getFavoliteFoods()) && Objects.equals(getAddressHistory(), member.getAddressHistory()) && Objects.equals(workAddress, member.workAddress) && Objects.equals(getPeriod(), member.getPeriod()) && Objects.equals(getTeam(), member.getTeam()) && Objects.equals(orders, member.orders) && Objects.equals(getLocker(), member.getLocker()) && Objects.equals(getProductMembers(), member.getProductMembers());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getAddress(), getFavoliteFoods(), getAddressHistory(), workAddress, getPeriod(), getTeam(), orders, getLocker(), getProductMembers());
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", address=" + address +
+                ", favoliteFoods=" + favoliteFoods +
+                ", addressHistory=" + addressHistory +
+                ", workAddress=" + workAddress +
+                ", period=" + period +
+                ", team=" + team +
+                ", orders=" + orders +
+                ", locker=" + locker +
+                ", productMembers=" + productMembers +
+                '}';
+    }
 
     /**
      * 값 객체의 변수 이름을 실제 테이블 컬럼으로 변경세팅할 수 있다.
