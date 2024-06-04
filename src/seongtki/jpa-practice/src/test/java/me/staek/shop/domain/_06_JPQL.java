@@ -635,4 +635,64 @@ public class _06_JPQL {
                 System.out.println(m.getOrderStatus());
         } catch (PersistenceException e) {}
     }
+
+    @Test
+    @DisplayName("조건식 - CASE")
+    public void test18() {
+        try {
+            /**
+             * select
+             *  case t.name
+             *  when 'team1' then '인센티브110%'
+             *  when 'team2' then '인센티브120%'
+             *  else '인센티브105%'
+             *  end
+             * from Team t;
+             */
+            List<String> resultList
+                    = em.createQuery(
+                            "select" +
+                                    " case t.name" +
+                                    " when 'team1' then '인센티브110%'" +
+                                    " when 'team2' then '인센티브120%'" +
+                                    " else '인센티브105%'" +
+                                    " end " +
+                                    "from Team t"
+                            , String.class)
+                    .getResultList();
+            for (String m : resultList)
+                System.out.println(m);
+        } catch (PersistenceException e) {}
+    }
+
+    @Test
+    @DisplayName("조건식 - coalesce : 팀 없는 회원은 0를 출력")
+    public void test19() {
+        try {
+            /**
+             * select coalesce(m.team_id, 0) from Member m;
+             */
+            List<Long> resultList
+                    = em.createQuery("select coalesce(m.team.id, 0) from Member m", Long.class)
+                    .getResultList();
+            for (Long m : resultList)
+                System.out.println(m);
+        } catch (PersistenceException e) {}
+    }
+
+    @Test
+    @DisplayName("조건식 - NULLIF : 사용자 이름이 seongtki0 이면 null을 반환하고 나머지는 본인의 이름을 반환")
+    public void test20() {
+        try {
+            /**
+             * select NULLIF(m.name, 'seongtki0') from Member m;
+             */
+            List<String> resultList
+                    = em.createQuery(
+                            "select NULLIF(m.name, 'seongtki0') from Member m", String.class)
+                    .getResultList();
+            for (String m : resultList)
+                System.out.println(m);
+        } catch (PersistenceException e) {}
+    }
 }
