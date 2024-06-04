@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import me.staek.shop.domain.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -137,7 +138,7 @@ public class _06_JPQL {
     }
 
     private static void createMember(EntityManager em) {
-        for (int i=0 ; i<10 ; i++) {
+        for (int i=0 ; i<30 ; i++) {
             Member member = new Member();
             member.setName("seongtki" + i);
 //        member.setTeam(team);
@@ -301,4 +302,168 @@ public class _06_JPQL {
         }
     }
 
+
+    /**
+     * oracle 페이징: rownum 사용을 왜 안하는 지 모르겠음..
+     *
+     * < 현재 이렇게 나온다 >
+     * select
+     *             *
+     *         from
+     *             (select
+     *                 m1_0.MEMBER_ID c0,
+     *                 m1_0.name c9,
+     *                 row_number() over(
+     *             order by
+     *                 m1_0.name desc) rn
+     *             from
+     *                 Member m1_0) r_0_
+     *         where
+     *             r_0_.rn<=13
+     *             and r_0_.rn>3
+     *         order by
+     *             r_0_.rn
+     * ;;
+     *
+     * <이렇게 나와야 할 거 같은데..>
+     * SELECT * FROM
+     *  ( SELECT ROW_.*, ROWNUM ROWNUM_
+     *  FROM
+     *  ( SELECT
+     *  M.member_ID AS ID,
+     *  M.TEAM_ID AS TEAM_ID,
+     *  M.NAME AS NAME
+     *  FROM MEMBER M
+     *  ORDER BY M.NAME desc
+     *  ) ROW_
+     *  WHERE ROWNUM <= 13
+     *  )
+     * WHERE ROWNUM_ > 3
+     */
+    @Test
+    @DisplayName("페이징")
+    public void test3() {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            List<Member> list = em.createQuery("select m from Member m order by m.name desc", Member.class)
+                    .setFirstResult(3)
+                    .setMaxResults(10)
+                    .getResultList();
+            for (Member m : list){
+                System.out.println(m.getName() + " " + m.getId());
+            }
+            tx.commit();
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            tx.rollback();
+        } finally {
+            em.close();
+            emf.close();
+        }
+    }
+
+
+    @Test
+    @DisplayName("inner join")
+    public void test4() {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            /**
+             * team : 지연로딩
+             */
+            List<Member> list = em.createQuery("select m from Member m inner join m.team t", Member.class)
+                    .getResultList();
+            for (Member m : list){
+                System.out.println(m.getName());
+//                System.out.println(m.getTeam().getName() + " " + m.getName());
+            }
+            tx.commit();
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            tx.rollback();
+        } finally {
+            em.close();
+            emf.close();
+        }
+    }
+
+    @Test
+    @DisplayName("left outer join")
+    public void test5() {
+        try {
+            /**
+             * team : 지연로딩
+             */
+            List<Member> list = em.createQuery("select m from Member m left outer join m.team t", Member.class)
+                    .getResultList();
+            for (Member m : list){
+                System.out.println(m.getName());
+
+//                System.out.println(m.getTeam().getName() + " " + m.getName());
+            }
+        } catch (PersistenceException e) {
+        } finally {
+        }
+    }
+
+
+    @Test
+    @DisplayName("cross join")
+    public void test6() {
+        try {
+            /**
+             * team : 지연로딩
+             */
+            List<Member> list = em.createQuery("select m from Member m cross join Team t where m.id = t.id", Member.class)
+                    .getResultList();
+            for (Member m : list){
+                System.out.println(m.getName());
+
+//                System.out.println(m.getTeam().getName() + " " + m.getName());
+            }
+        } catch (PersistenceException e) {
+        } finally {
+        }
+    }
+
+
+    @Test
+    @DisplayName("left join on 조건 (연관관계 존재)")
+    public void test7() {
+        try {
+            /**
+             * team : 지연로딩
+             */
+            List<Member> list = em.createQuery("select m from Member m left join m.team t on t.name = 'teamA'", Member.class)
+                    .getResultList();
+            for (Member m : list){
+                System.out.println(m.getName());
+
+//                System.out.println(m.getTeam().getName() + " " + m.getName());
+            }
+        } catch (PersistenceException e) {
+        } finally {
+        }
+    }
+
+    @Test
+    @DisplayName("left join on 조건 (연관관계 미존재)")
+    public void test8() {
+        try {
+            /**
+             * team : 지연로딩
+             */
+            List<Member> list = em.createQuery("select m from Member m left join Team t on t.name = 'teamA'", Member.class)
+                    .getResultList();
+            for (Member m : list){
+                System.out.println(m.getName());
+
+//                System.out.println(m.getTeam().getName() + " " + m.getName());
+            }
+        } catch (PersistenceException e) {
+        } finally {
+        }
+    }
 }
