@@ -190,13 +190,13 @@ public class _06_JPQL {
         try {
 
             tx.begin();
-            em.createQuery("delete from EntityAddress ").executeUpdate();
-            em.createQuery("delete from OrderItem ").executeUpdate();
-            em.createQuery("delete from Item").executeUpdate();
-            em.createQuery("delete from Order ").executeUpdate();
-            em.createQuery("delete from Delivery ").executeUpdate();
-            em.createQuery("delete from Member").executeUpdate();
-            em.createQuery("delete from Team").executeUpdate();
+//            em.createQuery("delete from EntityAddress ").executeUpdate();
+//            em.createQuery("delete from OrderItem ").executeUpdate();
+//            em.createQuery("delete from Item").executeUpdate();
+//            em.createQuery("delete from Order ").executeUpdate();
+//            em.createQuery("delete from Delivery ").executeUpdate();
+//            em.createQuery("delete from Member").executeUpdate();
+//            em.createQuery("delete from Team").executeUpdate();
             tx.commit();
         } catch (PersistenceException e) {
             e.printStackTrace();
@@ -465,5 +465,138 @@ public class _06_JPQL {
         } catch (PersistenceException e) {
         } finally {
         }
+    }
+
+
+    @Test
+    @DisplayName("서브쿼리 - from view")
+    public void test9() {
+        try {
+            /**
+             * select *
+             * from
+             * (select * from member
+             * where team_id is not null) m left join team t
+             * on m.team_id = t.team_id
+             *
+             *
+             * from view의 내용을 as 로 작성해야 외부에서 사용할 수 있는거 같다.
+             * https://in.relation.to/2022/06/24/hibernate-orm-61-features/
+             */
+            List<MemberDto> list = em.createQuery("select new me.staek.shop.domain.MemberDto(m.id, m.name) " +
+                            "from (select mm.id as id, mm.team.id as team_id, mm.name as name from Member mm where mm.team.id is not null) as m " +
+                            "left join Team t " +
+                            "on m.team_id = t.id", MemberDto.class)
+                    .getResultList();
+            for (MemberDto m : list)
+                System.out.println(m.getId() + " " + m.getName());
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("서브쿼리 where count - 한 건이라도 주문한 고객")
+    public void test10() {
+        try {
+            /**
+             * select * from Member m
+             * where (select count(1) from Orders o where m.member_id = o.member_id) > 0;
+             */
+            List<Member> list
+                    = em.createQuery("select m from Member m " +
+                                        "where (select count(m.id) from Order o where m.id = o.member.id) > 0", Member.class)
+                    .getResultList();
+            for (Member m : list)
+                System.out.println(m.getId() + " " + m.getName());
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("서브쿼리 exists - team1 소속인 회원")
+    public void test11() {
+        try {
+            /**
+             * select * from Member m
+             * where exists (select * from team t where m.team_id = t.team_id and t.name = 'team1');
+             */
+            List<Member> list
+                    = em.createQuery("select m from Member m " +
+                            "where exists (select t from m.team t where t.name = 'team1')", Member.class)
+                    .getResultList();
+            for (Member m : list)
+                System.out.println(m.getId() + " " + m.getName());
+        } catch (PersistenceException e) {}
+    }
+
+    @Test
+    @DisplayName("서브쿼리 where - 나이가 평균보다 많은 회원 ------- 아직안함")
+    public void test12() {
+        try {
+            /**
+             * select m from Member m
+             * where m.age > (select avg(m2.age) from Member m2)
+             */
+//            List<Member> list
+//                    = em.createQuery("select m from Member m " +
+//                            "where m.team = ANY (select t from Team t)", Member.class)
+//                    .getResultList();
+//            for (Member m : list)
+//                System.out.println(m.getId() + " " + m.getName());
+        } catch (PersistenceException e) {}
+    }
+
+
+
+    @Test
+    @DisplayName("서브쿼리 ALL - 전체 상품 각각의 재고보다 주문량이 많은 주문들 ------- 아직안함")
+    public void test13() {
+        try {
+            /**
+             * select * from Order o
+             * where o.orderAmount > ALL (select p.stockAmount from Product p);
+             */
+//            List<Member> list
+//                    = em.createQuery("select m from Member m " +
+//                            "where m.team = ANY (select t from Team t)", Member.class)
+//                    .getResultList();
+//            for (Member m : list)
+//                System.out.println(m.getId() + " " + m.getName());
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("서브쿼리 ANY - 어떤 팀이든 소속된 member")
+    public void test14() {
+        try {
+            /**
+             * select * from Member m
+             * where m.team_id = ANY (select t.team_id from Team t);
+             *
+             * 아래 쿼리에서 team 자체를 비교하는데, 이는 내부적으로 식별자비교를 암시한다. (team_id)
+             */
+            List<Member> list
+                    = em.createQuery("select m from Member m " +
+                            "where m.team = ANY (select t from Team t)", Member.class)
+                    .getResultList();
+            for (Member m : list)
+                System.out.println(m.getId() + " " + m.getName());
+        } catch (PersistenceException e) {}
+    }
+
+    @Test
+    @DisplayName("서브쿼리 스칼라 - 연관없는 쿼리")
+    public void test15() {
+        try {
+            /**
+             *select (select count(*) from team) as t from member m ;
+             */
+            List<Long> resultList = em.createQuery("select (select count(*) from Team t) from Member m", Long.class)
+                    .getResultList();
+            System.out.println(resultList.size());
+            for (Long m : resultList)
+                System.out.println(m);
+        } catch (PersistenceException e) {}
     }
 }
