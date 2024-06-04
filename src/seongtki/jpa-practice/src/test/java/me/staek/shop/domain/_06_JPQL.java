@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.matchers.Or;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -597,6 +598,41 @@ public class _06_JPQL {
             System.out.println(resultList.size());
             for (Long m : resultList)
                 System.out.println(m);
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("슈퍼서브타입 다형성 조회")
+    public void test16() {
+        try {
+            /**
+             * select * from item
+             * where dtype = 'Book';
+             */
+            List<Item> resultList = em.createQuery("select i from Item i where type(i) = Book", Item.class)
+                    .getResultList();
+            for (Item m : resultList)
+                System.out.println(m.getName() + " " + m.getPrice());
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("ENUM Type 조회")
+    public void test17() {
+        try {
+            /**
+             * select * from orders
+             * where orderStatus='ORDERED';
+             */
+            List<Order> resultList
+                    = em.createQuery(
+                            "select o from Order o where o.orderStatus = me.staek.shop.domain.OrderStatus.ORDERED"
+                            , Order.class)
+                        .getResultList();
+            for (Order m : resultList)
+                System.out.println(m.getOrderStatus());
         } catch (PersistenceException e) {}
     }
 }
