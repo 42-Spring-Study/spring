@@ -943,4 +943,46 @@ public class _06_JPQL {
         } catch (PersistenceException e) {}
     }
 
+    @Test
+    @DisplayName("벌크연산")
+    public void test29() {
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+
+            List<OrderItem> oList = em.createQuery("select o from OrderItem o", OrderItem.class).getResultList();
+
+            for (OrderItem orderItem : oList) {
+                System.out.println(orderItem.getCount() + " " + orderItem.getOrderPrice());
+            }
+
+            /**
+             * 벌크연산은 1차캐시와 관계없이 dbms에 바로 적용한다.
+             */
+            int i = em.createQuery("update OrderItem o set o.count=20000").executeUpdate();
+            System.out.println("성공건수 : "+i);
+
+            /**
+             * 벌크연산 이전 정보를 1차캐시에서 조회한다. (정합성 오류)
+             */
+            for (OrderItem orderItem : oList) {
+                System.out.println(orderItem.getCount() + " " + orderItem.getOrderPrice());
+            }
+
+            /**
+             * 캐시를 비우고 다시 조회하면 된다.
+             * -> 벌크연산 이후 캐시를 비우는게 좋다.
+             */
+            em.clear();
+            List<OrderItem> oList2 = em.createQuery("select o from OrderItem o", OrderItem.class).getResultList();
+            for (OrderItem orderItem : oList2) {
+                System.out.println(orderItem.getCount() + " " + orderItem.getOrderPrice());
+            }
+            tx.commit();
+        } catch (PersistenceException e) {
+            tx.rollback();
+        }
+    }
+
+
 }
