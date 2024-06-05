@@ -908,4 +908,39 @@ public class _06_JPQL {
 
         } catch (PersistenceException e) {}
     }
+
+
+    @Test
+    @DisplayName("슈퍼서브타입 다형성 조회 - treat")
+    public void test27() {
+        try {
+            /**
+             * select * from item
+             * where dtype = 'Book';
+             */
+            List<Item> resultList = em.createQuery("select i from Item i where treat(i as Book).name = 'JPA5'", Item.class)
+                    .getResultList();
+            for (Item m : resultList)
+                System.out.println(m.getName() + " " + m.getPrice());
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("Named query")
+    public void test28() {
+        try {
+            /**
+             * static query 구성 가능
+             * - app로딩 시점에 syntax 오류체크한다.
+             * - 쿼리를 디비 캐시에 올려놓는다 (테스트 필요)
+             * - spring jpa에서 편하게 제공함
+             */
+            List<Member> list = em.createNamedQuery("Member.findByName", Member.class)
+                    .setParameter("name", "seongtki1").getResultList();
+            for (Member m : list)
+                System.out.println(m.getName());
+        } catch (PersistenceException e) {}
+    }
+
 }
