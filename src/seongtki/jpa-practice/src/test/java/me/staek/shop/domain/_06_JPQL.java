@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.Or;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -693,6 +694,55 @@ public class _06_JPQL {
                     .getResultList();
             for (String m : resultList)
                 System.out.println(m);
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("사용자 정의 함수")
+    public void test21() {
+        try {
+            /**
+             * function
+             CREATE OR REPLACE FUNCTION fn_member_name (p_name varchar)
+             RETURN VARCHAR2
+             IS
+             v_dname VARCHAR2(200);
+             BEGIN
+             SELECT member_id || ' : ' ||  name
+             INTO v_dname
+             FROM member
+             WHERE name = p_name;
+
+             RETURN v_dname;
+             END;
+             *
+             * select fn_member_name('seongtki1') from dual;
+             */
+            List<String> resultList
+                    = em.createQuery(
+                            "select fn_member_name(m.name) from Member m", String.class)
+                    .getResultList();
+            for (String m : resultList)
+                System.out.println(m);
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("DBMS Function call : systimestamp()")
+    public void test22() {
+        try {
+            /**
+             *
+             * select systimestamp from member;
+             */
+            List<Timestamp> resultList
+                    = em.createQuery(
+                            "select systimestamp() from Member m", Timestamp.class)
+                    .getResultList();
+            for (Timestamp m : resultList)
+                System.out.println(m.toLocalDateTime().toString());
         } catch (PersistenceException e) {}
     }
 }
