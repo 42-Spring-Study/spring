@@ -253,7 +253,7 @@ public class _06_JPQL {
             em.createQuery("select m from Member m", Member.class).getResultList();
 
             /**
-             * Entity 프로젝션 > 묵시적조인
+             * Entity 프로젝션 > 묵시적조인 (Inner join)
              * 예측이 어려워 지양
              */
 //            List<Team> teamList = em.createQuery("select m.team from Member m", Team.class).getResultList();
@@ -743,6 +743,169 @@ public class _06_JPQL {
                     .getResultList();
             for (Timestamp m : resultList)
                 System.out.println(m.toLocalDateTime().toString());
+        } catch (PersistenceException e) {}
+    }
+
+    @Test
+    @DisplayName("fetch join - N : 1")
+    public void test23() {
+        try {
+            /**
+             * 일반적인 Inner joind은 지연로딩일 때 N+1 문제가 발생
+             *
+             * fetch join은 Join하여 결과를 리턴함 (쿼리1회)
+             * - on 조건은 식별자를 자동으로 추가
+             * - join한 두 테이블의 데이터를 모두 projection 함
+             *
+             * fetch join Entity에는 별칭 주지 말자. (하이버네이트는 가능)
+             * - fetch join을 연달아 사용할 때 말고는 사이트이펙트가 있으므로 사용하지 말자.
+             * 두개 이상의 컬렉션은 fetch join 하면 안됨. => 앵?
+             */
+            List<Member> resultList
+                    = em.createQuery(
+                            "select m from Member m join fetch m.team", Member.class)
+                    .getResultList();
+            for (Member m : resultList)
+                System.out.println(m.getName() + " " + m.getTeam().getName());
+        } catch (PersistenceException e) {}
+    }
+
+    @Test
+    @DisplayName("fetch join - 1 : N")
+    public void test24() {
+        try {
+            /**
+             * 일반조인 > Inner joind은 지연로딩일 때 N+1 문제가 발생
+             */
+            List<Team> resultList
+                    = em.createQuery(
+                            "select t from Team t join fetch t.members", Team.class)
+                    .getResultList();
+            for (Team m : resultList) {
+                System.out.print(m.getName() + " :: ");
+                for (Member member : m.getMembers()) {
+                    System.out.print(member.getId() + "(" + member.getName() + ") ");
+                }
+                System.out.println();
+            }
+        } catch (PersistenceException e) {}
+    }
+
+
+    @Test
+    @DisplayName("fetch join - 1 : N : N")
+    public void test25() {
+        try {
+            /**
+             * <fetch join>
+             * fetch join 에서 1 : N : N 은 MultipleBagFetchException가 발생함
+             */
+//            List<Order> resultList = em.createQuery("select t from Team t join fetch t.members m join fetch m.orders", Order.class).getResultList();
+//            for (Order m : resultList) {
+//                System.out.println(m.getOrderStatus());
+//                System.out.println();
+//            }
+
+            /**
+             * <일반조회>
+             * 일반조회 시 Team 속성만 결과가 조회된다.
+             * - 객체 그래프로 다른 Entity를 조회하는 시점에 쿼리가 요청된다.
+             */
+//            List<Team> resultList = em.createQuery("select t from Team t inner join Member m on t.id = m.team.id " +
+//                                                        "inner join Order o on m.id = o.member.id", Team.class).getResultList();
+//            for (Team m : resultList) {
+//                System.out.println(m.getName() + " " + m.getMembers().get(0).getName());
+//                System.out.println();
+//            }
+
+            /**
+             * <일반조회>
+             * Dao를 만들어서 필요한 속성을 projection 하여 사용할 수 있다.
+             */
+            List<MemberOrderDto> resultList = em.createQuery("select new me.staek.shop.domain.MemberOrderDto(m.id , t.name, m.name, o.orderStatus) from Team t inner join Member m on t.id = m.team.id " +
+                    "inner join Order o on m.id = o.member.id", MemberOrderDto.class)
+                    .getResultList();
+
+            for (MemberOrderDto m : resultList) {
+                System.out.print(m.getMemberId() + " : " + m.getMemberName() + " " + m.getTeamName() + " " + m.getOrderStatus());
+                System.out.println();
+            }
+        } catch (PersistenceException e) {}
+    }
+
+    /**
+     * 페이징
+     * 1:N 형태의 fetch Join은 불가하다.
+     *
+     * 방법1) N:1 형태로 변경하여 쿼리작성
+     * 방법2) 1쪽을 작성하고, M쪽이 호출 될 때, 필요량이 페이징개수만큼 요청되게 함 (batch_size 설정)
+     * 방법3) 일반조인 작성하고 DAO 작성해서 해결
+     *
+     */
+    @Test
+    @DisplayName("fetch join - 1:N페이징")
+    public void test26() {
+        try {
+            /**
+             * 1:1, N:1 의 fetch join은 페이징이 가능하다.
+             */
+//            List<Member> list = em.createQuery("select m from Member m join fetch m.team", Member.class)
+//                    .setFirstResult(0)
+//                    .setMaxResults(4)
+//                    .getResultList();
+//            for (Member m : list){
+//                System.out.println(m.getName() + " " + m.getId());
+//            }
+
+            /**
+             * 1:N fetch join은 페이징이 안된다. (경고발생)
+             */
+//            List<Team> list = em.createQuery("select t from Team t join fetch t.members", Team.class)
+//                    .setFirstResult(0)
+//                    .setMaxResults(3)
+//                    .getResultList();
+//            for (Team m : list){
+//                System.out.println(m.getName() + " :: ");
+//                for (Member member : m.getMembers()) {
+//                    System.out.print(member.getName() + "(" + member.getId() + ") ");
+//                }
+//                System.out.println();
+//            }
+
+            /**
+             *
+             * 방법2)
+             * default_batch_fetch_size 혹은 @batchSize 참조하여 in 쿼리로 필요한만큼 요청함
+             *
+             * - 이해가 안가는 점 : in 조건에 배치사이즈 만큼 인자가 들어가고, 실제 요청인자강 없으면 Null로 세팅 됨 ...
+             */
+//            List<Team> list = em.createQuery("select t from Team t", Team.class)
+//                    .setFirstResult(1)
+//                    .setMaxResults(7)
+//                    .getResultList();
+//            for (Team m : list){
+//                System.out.print(m.getName() + " :: ");
+//                for (Member member : m.getMembers()) {
+//                    System.out.print(member.getName() + "(" + member.getId() + ") ");
+//                }
+//                System.out.println();
+//            }
+
+            /**
+             * 방법3)
+             * 일반조인에 DAO를 만들어서 사용할 수 있다.
+             */
+            List<MemberOrderDto> resultList = em.createQuery("select new me.staek.shop.domain.MemberOrderDto(m.id , t.name, m.name, o.orderStatus) from Team t inner join Member m on t.id = m.team.id " +
+                            "inner join Order o on m.id = o.member.id", MemberOrderDto.class)
+                    .setFirstResult(0)
+                    .setMaxResults(7)
+                    .getResultList();
+
+            for (MemberOrderDto m : resultList) {
+                System.out.print(m.getMemberId() + " : " + m.getMemberName() + " " + m.getTeamName() + " " + m.getOrderStatus());
+                System.out.println();
+            }
+
         } catch (PersistenceException e) {}
     }
 }
