@@ -1,5 +1,6 @@
-package me.staek.shop.domain;
+package me.staek.shop.repository;
 
+import me.staek.shop.domain.Member;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +28,7 @@ class MemberRepositoryTest {
         Long id = memberRepository.save(member);
 
 
-        Member found = memberRepository.find(id);
+        Member found = memberRepository.findOne(id);
 
         Assertions.assertThat(found.getId()).isEqualTo(member.getId());
         Assertions.assertThat(found.getName()).isEqualTo(member.getName());
