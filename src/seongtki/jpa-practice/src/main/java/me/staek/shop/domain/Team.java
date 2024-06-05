@@ -2,6 +2,7 @@ package me.staek.shop.domain;
 
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,10 @@ public class Team {
      * 1쪽 연관관계 매핑
      */
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    /**
+     * _06_JPQL > test26
+     */
+    @BatchSize(size = 10)
     private List<Member> members = new ArrayList<>();
 
     /**
