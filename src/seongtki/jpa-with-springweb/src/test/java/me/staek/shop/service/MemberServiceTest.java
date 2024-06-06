@@ -54,7 +54,7 @@ public class MemberServiceTest {
 
         //when
         memberService.join(member1);
-//        memberService.join(member2); //예외가 발생해야 한다!!!
+        memberService.join(member2); //예외가 발생해야 한다!!!
 
         //then
         fail("예외가 발생해야 한다.");
