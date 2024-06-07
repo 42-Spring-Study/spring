@@ -12,6 +12,7 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+    database-platform: org.hibernate.community.dialect.Oracle10gDialect
 
 logging.level:
   org.hibernate.SQL: debug
